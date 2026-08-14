@@ -1,0 +1,1177 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Le laboratoire des décimaux | Clic et Étudie</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial, Helvetica, sans-serif;
+  background:linear-gradient(135deg,#f7f5ef,#fff9e8);
+  color:#243447;
+  padding:18px;
+}
+
+.game{
+  width:min(960px,100%);
+  margin:0 auto;
+  background:#fff;
+  border-radius:24px;
+  box-shadow:0 14px 40px rgba(0,0,0,.12);
+  padding:26px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  gap:16px;
+  align-items:center;
+  flex-wrap:wrap;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:800;
+}
+
+.brand span{
+  color:#d5a42b;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.pill{
+  background:#f2f4f6;
+  border-radius:14px;
+  padding:9px 13px;
+  font-weight:700;
+}
+
+.progress-wrap{
+  height:12px;
+  background:#ececec;
+  border-radius:20px;
+  overflow:hidden;
+  margin:20px 0 26px;
+}
+
+.progress{
+  height:100%;
+  width:0;
+  background:#d5a42b;
+  transition:.3s;
+}
+
+h1{
+  text-align:center;
+  margin:5px 0 8px;
+  font-size:30px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#68717d;
+  margin-bottom:18px;
+}
+
+.round-title{
+  text-align:center;
+  font-weight:800;
+  color:#9a7110;
+  margin:8px 0;
+}
+
+.instruction{
+  background:#f7f9fb;
+  border-left:6px solid #d5a42b;
+  border-radius:14px;
+  padding:16px 18px;
+  margin:18px 0;
+  font-size:18px;
+  text-align:center;
+}
+
+.pool,
+.order-zone{
+  min-height:110px;
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  justify-content:center;
+  align-items:center;
+  padding:18px;
+  border:2px dashed #d6d9dd;
+  border-radius:18px;
+  background:#fbfbfb;
+}
+
+.card{
+  min-width:88px;
+  padding:15px 18px;
+  border:2px solid #dfe3e7;
+  border-radius:14px;
+  background:white;
+  font-size:21px;
+  font-weight:800;
+  text-align:center;
+  cursor:grab;
+  user-select:none;
+  box-shadow:0 4px 10px rgba(0,0,0,.05);
+  transition:.15s;
+}
+
+.card:hover{
+  transform:translateY(-2px);
+  border-color:#d5a42b;
+}
+
+.card.selected{
+  outline:4px solid rgba(213,164,43,.28);
+  border-color:#d5a42b;
+}
+
+.card.correct{
+  background:#e7f7ea;
+  border-color:#51a864;
+}
+
+.card.wrong{
+  background:#fde7e7;
+  border-color:#d85b5b;
+}
+
+.bins{
+  display:grid;
+  grid-template-columns:repeat(3,1fr);
+  gap:14px;
+  margin-top:18px;
+}
+
+.bin{
+  min-height:165px;
+  border:2px dashed #bfc7cf;
+  border-radius:18px;
+  padding:12px;
+  background:#fafafa;
+  display:flex;
+  flex-direction:column;
+  gap:10px;
+  align-items:center;
+}
+
+.bin h3{
+  margin:4px 0 8px;
+  font-size:20px;
+}
+
+.bin .drop{
+  width:100%;
+  min-height:100px;
+  display:flex;
+  gap:8px;
+  flex-wrap:wrap;
+  align-content:flex-start;
+  justify-content:center;
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+button{
+  border:0;
+  border-radius:13px;
+  padding:13px 18px;
+  font-weight:800;
+  font-size:16px;
+  cursor:pointer;
+}
+
+.primary{
+  background:#d5a42b;
+  color:#1f2933;
+}
+
+.secondary{
+  background:#243447;
+  color:#fff;
+}
+
+.ghost{
+  background:#eef1f4;
+  color:#243447;
+}
+
+button:disabled{
+  opacity:.5;
+  cursor:not-allowed;
+}
+
+.feedback{
+  display:none;
+  margin-top:20px;
+  border-radius:16px;
+  padding:18px;
+  line-height:1.5;
+}
+
+.feedback.good{
+  background:#e8f7eb;
+}
+
+.feedback.bad{
+  background:#fff0f0;
+}
+
+.feedback strong{
+  display:block;
+  font-size:19px;
+  margin-bottom:5px;
+}
+
+.tip{
+  display:none;
+  margin-top:14px;
+  background:#fff6d5;
+  border-radius:14px;
+  padding:15px;
+}
+
+.rule{
+  text-align:center;
+  margin:10px 0 15px;
+  font-size:20px;
+  font-weight:800;
+}
+
+.end{
+  text-align:center;
+  display:none;
+  padding:20px 5px;
+}
+
+.end .icon{
+  font-size:68px;
+}
+
+.score-big{
+  font-size:44px;
+  font-weight:900;
+  color:#d5a42b;
+  margin:15px 0;
+}
+
+.small{
+  color:#6d7580;
+  font-size:14px;
+  text-align:center;
+  margin-top:10px;
+}
+
+@media(max-width:720px){
+  .game{
+    padding:18px;
+  }
+
+  .bins{
+    grid-template-columns:1fr;
+  }
+
+  h1{
+    font-size:25px;
+  }
+
+  .card{
+    font-size:19px;
+    min-width:78px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+  <div id="play">
+
+    <div class="topbar">
+
+      <div class="brand">
+        Clic <span>et Étudie</span>
+      </div>
+
+      <div class="stats">
+        <div class="pill">⭐ <span id="score">0</span></div>
+        <div class="pill">🔥 <span id="streak">0</span></div>
+        <div class="pill">❤️ <span id="lives">3</span></div>
+      </div>
+
+    </div>
+
+    <div class="progress-wrap">
+      <div class="progress" id="progress"></div>
+    </div>
+
+    <div class="round-title" id="roundTitle"></div>
+
+    <h1>🧪 Le laboratoire des décimaux</h1>
+
+    <div class="subtitle">
+      Ordonner, classer et ranger des nombres décimaux
+    </div>
+
+    <div class="instruction" id="instruction"></div>
+
+    <div id="classifyArea" style="display:none">
+
+      <div class="pool" id="pool"></div>
+
+      <div class="bins" id="bins"></div>
+
+    </div>
+
+    <div id="orderArea" style="display:none">
+
+      <div class="rule" id="orderRule"></div>
+
+      <div class="order-zone" id="orderZone"></div>
+
+      <div class="small">
+        Sur ordinateur : fais glisser les cartes.
+        Sur téléphone ou tablette : touche une carte puis une autre pour les échanger.
+      </div>
+
+    </div>
+
+    <div class="actions">
+
+      <button class="ghost" id="hintBtn" onclick="showHint()">
+        💡 Indice − 50 pts
+      </button>
+
+      <button class="primary" id="checkBtn" onclick="checkRound()">
+        Valider
+      </button>
+
+      <button class="secondary" id="nextBtn" onclick="nextRound()" style="display:none">
+        Étape suivante ➜
+      </button>
+
+    </div>
+
+    <div class="tip" id="tip"></div>
+
+    <div class="feedback" id="feedback">
+
+      <strong id="feedbackTitle"></strong>
+
+      <span id="feedbackText"></span>
+
+    </div>
+
+  </div>
+
+  <div class="end" id="end">
+
+    <div class="icon" id="endIcon">🏆</div>
+
+    <h1>Laboratoire terminé !</h1>
+
+    <div class="score-big">
+      <span id="finalScore">0</span> points
+    </div>
+
+    <p id="finalText"></p>
+
+    <button class="secondary" onclick="restart()">
+      🔄 Rejouer
+    </button>
+
+  </div>
+
+</div>
+
+<script>
+
+const rounds = [
+
+  {
+    type:"classify",
+    title:"Manche 1 — Classe les nombres",
+    instruction:"Glisse chaque nombre dans la bonne zone.",
+
+    values:[
+      "8,7",
+      "10",
+      "12,04",
+      "9,99",
+      "10,0",
+      "15,3"
+    ],
+
+    bins:[
+      {
+        label:"< 10",
+        test:v => num(v) < 10
+      },
+      {
+        label:"= 10",
+        test:v => num(v) === 10
+      },
+      {
+        label:"> 10",
+        test:v => num(v) > 10
+      }
+    ],
+
+    hint:
+      "Compare d'abord la partie entière. Si elle est inférieure à 10, le nombre est déjà plus petit que 10.",
+
+    explanation:
+      "Pour comparer à 10, observe d'abord la partie entière. Et n'oublie pas : 10 = 10,0 = 10,00."
+  },
+
+  {
+    type:"order",
+    title:"Manche 2 — Du plus petit au plus grand",
+    instruction:"Range les nombres dans l'ordre croissant.",
+
+    values:[
+      "3,6",
+      "3,06",
+      "3,16",
+      "3,61",
+      "3,1"
+    ],
+
+    direction:"asc",
+
+    hint:
+      "Tu peux écrire des zéros à droite : 3,6 = 3,60 et 3,1 = 3,10.",
+
+    explanation:
+      "Pour comparer des décimaux proches, aligne mentalement les chiffres : 3,06 < 3,10 < 3,16 < 3,60 < 3,61."
+  },
+
+  {
+    type:"order",
+    title:"Manche 3 — Attention aux pièges !",
+    instruction:"Range les nombres dans l'ordre croissant.",
+
+    values:[
+      "4,7",
+      "4,07",
+      "4,70",
+      "4,17",
+      "4,007"
+    ],
+
+    direction:"asc",
+
+    hint:
+      "4,7 et 4,70 représentent exactement le même nombre.",
+
+    explanation:
+      "Les zéros ajoutés à droite de la partie décimale ne changent pas la valeur du nombre : 4,7 = 4,70."
+  },
+
+  {
+    type:"order",
+    title:"Manche 4 — Ordre décroissant",
+    instruction:"Range les nombres du plus grand au plus petit.",
+
+    values:[
+      "12,5",
+      "12,05",
+      "12,51",
+      "11,99",
+      "12,15"
+    ],
+
+    direction:"desc",
+
+    hint:
+      "Compare d'abord les parties entières, puis les dixièmes, les centièmes, etc.",
+
+    explanation:
+      "En ordre décroissant, on part du plus grand : 12,51 > 12,5 > 12,15 > 12,05 > 11,99."
+  },
+
+  {
+    type:"order",
+    title:"Défi final — Le code du laboratoire",
+    instruction:"Dernier défi : range toute la série dans l'ordre croissant.",
+
+    values:[
+      "0,9",
+      "0,09",
+      "1,01",
+      "1,1",
+      "0,99",
+      "1,001",
+      "0,909"
+    ],
+
+    direction:"asc",
+
+    hint:
+      "Ajoute mentalement des zéros pour avoir le même nombre de chiffres après la virgule.",
+
+    explanation:
+      "Comparer chiffre par chiffre permet d'éviter les pièges : 0,09 < 0,9 < 0,909 < 0,99 < 1,001 < 1,01 < 1,1."
+  }
+
+];
+
+function num(v){
+  return Number(v.replace(",","."));
+}
+
+let round = 0;
+let score = 0;
+let lives = 3;
+let streak = 0;
+let correctRounds = 0;
+let checked = false;
+let selectedCard = null;
+
+function shuffle(a){
+
+  a = [...a];
+
+  for(let i = a.length - 1; i > 0; i--){
+
+    const j = Math.floor(Math.random() * (i + 1));
+
+    [a[i], a[j]] = [a[j], a[i]];
+
+  }
+
+  return a;
+}
+
+function makeCard(value){
+
+  const el = document.createElement("div");
+
+  el.className = "card";
+  el.textContent = value;
+  el.draggable = true;
+  el.dataset.value = value;
+
+  el.addEventListener("dragstart", e => {
+
+    e.dataTransfer.setData("text/plain", value);
+
+    e.dataTransfer.effectAllowed = "move";
+
+    window.dragEl = el;
+
+  });
+
+  el.addEventListener("click", () => {
+
+    if(checked) return;
+
+    if(rounds[round].type === "order"){
+
+      if(!selectedCard){
+
+        selectedCard = el;
+
+        el.classList.add("selected");
+
+      }
+
+      else if(selectedCard === el){
+
+        el.classList.remove("selected");
+
+        selectedCard = null;
+
+      }
+
+      else{
+
+        const parent = el.parentNode;
+
+        const marker = document.createElement("span");
+
+        parent.insertBefore(marker, selectedCard);
+
+        parent.insertBefore(selectedCard, el.nextSibling);
+
+        parent.insertBefore(el, marker);
+
+        marker.remove();
+
+        selectedCard.classList.remove("selected");
+
+        selectedCard = null;
+
+      }
+
+    }
+
+  });
+
+  return el;
+}
+
+function allowDrop(zone){
+
+  zone.addEventListener("dragover", e => e.preventDefault());
+
+  zone.addEventListener("drop", e => {
+
+    e.preventDefault();
+
+    if(checked || !window.dragEl) return;
+
+    if(rounds[round].type === "classify"){
+
+      zone.appendChild(window.dragEl);
+
+    }
+
+  });
+
+}
+
+function render(){
+
+  checked = false;
+
+  selectedCard = null;
+
+  document.getElementById("feedback").style.display = "none";
+
+  document.getElementById("tip").style.display = "none";
+
+  document.getElementById("nextBtn").style.display = "none";
+
+  document.getElementById("checkBtn").style.display = "inline-block";
+
+  document.getElementById("hintBtn").disabled = false;
+
+  document.getElementById("progress").style.width =
+    (round / rounds.length * 100) + "%";
+
+  document.getElementById("roundTitle").textContent =
+    rounds[round].title;
+
+  document.getElementById("instruction").textContent =
+    rounds[round].instruction;
+
+  const r = rounds[round];
+
+  const classify =
+    document.getElementById("classifyArea");
+
+  const order =
+    document.getElementById("orderArea");
+
+  classify.style.display =
+    r.type === "classify" ? "block" : "none";
+
+  order.style.display =
+    r.type === "order" ? "block" : "none";
+
+  if(r.type === "classify"){
+
+    const pool =
+      document.getElementById("pool");
+
+    const bins =
+      document.getElementById("bins");
+
+    pool.innerHTML = "";
+
+    bins.innerHTML = "";
+
+    allowDrop(pool);
+
+    shuffle(r.values).forEach(v => {
+
+      const card = makeCard(v);
+
+      card.addEventListener("click", () => {
+
+        if(checked) return;
+
+        if(selectedCard){
+
+          selectedCard.classList.remove("selected");
+
+        }
+
+        selectedCard = card;
+
+        card.classList.add("selected");
+
+      });
+
+      pool.appendChild(card);
+
+    });
+
+    r.bins.forEach((b,i) => {
+
+      const box =
+        document.createElement("div");
+
+      box.className = "bin";
+
+      box.innerHTML =
+        `<h3>${b.label}</h3>
+        <div class="drop" data-bin="${i}"></div>`;
+
+      const drop =
+        box.querySelector(".drop");
+
+      allowDrop(drop);
+
+      box.addEventListener("click", () => {
+
+        if(checked || !selectedCard) return;
+
+        drop.appendChild(selectedCard);
+
+        selectedCard.classList.remove("selected");
+
+        selectedCard = null;
+
+      });
+
+      bins.appendChild(box);
+
+    });
+
+  }
+
+  else{
+
+    const zone =
+      document.getElementById("orderZone");
+
+    zone.innerHTML = "";
+
+    document.getElementById("orderRule").textContent =
+      r.direction === "asc"
+      ? "⬆️ Ordre croissant"
+      : "⬇️ Ordre décroissant";
+
+    shuffle(r.values).forEach(v => {
+
+      zone.appendChild(makeCard(v));
+
+    });
+
+    zone.addEventListener("dragover", e => {
+
+      e.preventDefault();
+
+      if(!window.dragEl) return;
+
+      const cards =
+        [...zone.querySelectorAll(".card")];
+
+      const x =
+        e.clientX;
+
+      let closest =
+        null;
+
+      let closestDist =
+        Infinity;
+
+      cards.forEach(c => {
+
+        if(c === window.dragEl) return;
+
+        const rect =
+          c.getBoundingClientRect();
+
+        const dist =
+          Math.abs(x - (rect.left + rect.width / 2));
+
+        if(dist < closestDist){
+
+          closestDist = dist;
+
+          closest = c;
+
+        }
+
+      });
+
+      if(closest){
+
+        const rect =
+          closest.getBoundingClientRect();
+
+        if(x < rect.left + rect.width / 2){
+
+          zone.insertBefore(
+            window.dragEl,
+            closest
+          );
+
+        }
+
+        else{
+
+          zone.insertBefore(
+            window.dragEl,
+            closest.nextSibling
+          );
+
+        }
+
+      }
+
+    });
+
+  }
+
+  updateStats();
+
+}
+
+function checkRound(){
+
+  if(checked) return;
+
+  const r =
+    rounds[round];
+
+  let ok =
+    true;
+
+  if(r.type === "classify"){
+
+    const pool =
+      document.getElementById("pool");
+
+    if(pool.querySelectorAll(".card").length > 0){
+
+      showFeedback(
+        false,
+        "Il reste des nombres à classer.",
+        "Place toutes les cartes avant de valider."
+      );
+
+      return;
+
+    }
+
+    document.querySelectorAll(".drop").forEach(drop => {
+
+      const idx =
+        Number(drop.dataset.bin);
+
+      [...drop.children].forEach(card => {
+
+        const good =
+          r.bins[idx].test(card.dataset.value);
+
+        card.classList.add(
+          good ? "correct" : "wrong"
+        );
+
+        if(!good) ok = false;
+
+      });
+
+    });
+
+  }
+
+  else{
+
+    const zone =
+      document.getElementById("orderZone");
+
+    const vals =
+      [...zone.children].map(
+        c => num(c.dataset.value)
+      );
+
+    const expected =
+      [...vals].sort(
+        (a,b) =>
+          r.direction === "asc"
+          ? a - b
+          : b - a
+      );
+
+    ok =
+      vals.every(
+        (v,i) =>
+          Math.abs(v - expected[i]) < 1e-9
+      );
+
+    [...zone.children].forEach((c,i) => {
+
+      c.classList.add(
+        Math.abs(vals[i] - expected[i]) < 1e-9
+        ? "correct"
+        : "wrong"
+      );
+
+    });
+
+  }
+
+  checked = true;
+
+  document.getElementById("checkBtn").style.display =
+    "none";
+
+  document.getElementById("nextBtn").style.display =
+    "inline-block";
+
+  document.getElementById("hintBtn").disabled =
+    true;
+
+  if(ok){
+
+    correctRounds++;
+
+    streak++;
+
+    let pts =
+      300;
+
+    if(streak >= 2){
+
+      pts += 100;
+
+    }
+
+    score += pts;
+
+    showFeedback(
+      true,
+      "✅ Mission réussie !",
+      r.explanation + " +" + pts + " points."
+    );
+
+  }
+
+  else{
+
+    lives--;
+
+    streak = 0;
+
+    showFeedback(
+      false,
+      "❌ Pas encore.",
+      r.explanation
+    );
+
+  }
+
+  updateStats();
+
+}
+
+function showFeedback(good,title,text){
+
+  const f =
+    document.getElementById("feedback");
+
+  f.className =
+    "feedback " + (good ? "good" : "bad");
+
+  document.getElementById("feedbackTitle").textContent =
+    title;
+
+  document.getElementById("feedbackText").textContent =
+    text;
+
+  f.style.display =
+    "block";
+
+}
+
+function showHint(){
+
+  const tip =
+    document.getElementById("tip");
+
+  tip.textContent =
+    "💡 " + rounds[round].hint;
+
+  tip.style.display =
+    "block";
+
+  if(score >= 50){
+
+    score -= 50;
+
+  }
+
+  document.getElementById("hintBtn").disabled =
+    true;
+
+  updateStats();
+
+}
+
+function nextRound(){
+
+  if(lives <= 0){
+
+    endGame();
+
+    return;
+
+  }
+
+  round++;
+
+  if(round >= rounds.length){
+
+    endGame();
+
+    return;
+
+  }
+
+  render();
+
+}
+
+function updateStats(){
+
+  document.getElementById("score").textContent =
+    score;
+
+  document.getElementById("lives").textContent =
+    lives;
+
+  document.getElementById("streak").textContent =
+    streak;
+
+}
+
+function endGame(){
+
+  document.getElementById("play").style.display =
+    "none";
+
+  document.getElementById("end").style.display =
+    "block";
+
+  document.getElementById("finalScore").textContent =
+    score;
+
+  const pct =
+    Math.round(
+      correctRounds / rounds.length * 100
+    );
+
+  let icon =
+    "📚";
+
+  let text =
+    "Revois les règles de comparaison puis retente le laboratoire.";
+
+  if(pct >= 80){
+
+    icon = "🏆";
+
+    text =
+      "Bravo ! Tu sais très bien comparer et ranger les nombres décimaux.";
+
+  }
+
+  else if(pct >= 60){
+
+    icon = "⭐";
+
+    text =
+      "Très bon travail ! Encore un peu d'entraînement sur les nombres proches.";
+
+  }
+
+  else if(pct >= 40){
+
+    icon = "💪";
+
+    text =
+      "Tu progresses. Pense à aligner les chiffres après la virgule pour comparer.";
+
+  }
+
+  if(lives <= 0){
+
+    icon = "❤️";
+
+    text =
+      "Tu as utilisé tes trois vies. Relis les explications puis recommence.";
+
+  }
+
+  document.getElementById("endIcon").textContent =
+    icon;
+
+  document.getElementById("finalText").textContent =
+    correctRounds
+    + " manche(s) réussie(s) sur "
+    + rounds.length
+    + " — "
+    + pct
+    + "% de réussite. "
+    + text;
+
+}
+
+function restart(){
+
+  round = 0;
+
+  score = 0;
+
+  lives = 3;
+
+  streak = 0;
+
+  correctRounds = 0;
+
+  checked = false;
+
+  document.getElementById("end").style.display =
+    "none";
+
+  document.getElementById("play").style.display =
+    "block";
+
+  render();
+
+}
+
+render();
+
+</script>
+
+</body>
+</html>
