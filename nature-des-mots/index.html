@@ -1,0 +1,794 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>Mission Nature des mots | Clic et Étudie</title>
+
+  <style>
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      font-family: Arial, Helvetica, sans-serif;
+      background: linear-gradient(135deg, #f8f6ef, #fff9e9);
+      color: #233142;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      padding: 20px;
+    }
+
+    .game {
+      width: 100%;
+      max-width: 850px;
+      background: white;
+      border-radius: 24px;
+      padding: 30px;
+      box-shadow: 0 15px 40px rgba(0,0,0,0.12);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 15px;
+      margin-bottom: 25px;
+    }
+
+    .logo {
+      font-size: 22px;
+      font-weight: bold;
+      color: #233142;
+    }
+
+    .logo span {
+      color: #d6a52a;
+    }
+
+    .stats {
+      display: flex;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .stat {
+      background: #f5f5f5;
+      border-radius: 15px;
+      padding: 9px 14px;
+      font-weight: bold;
+    }
+
+    .progress-container {
+      height: 12px;
+      background: #eeeeee;
+      border-radius: 20px;
+      overflow: hidden;
+      margin-bottom: 30px;
+    }
+
+    .progress {
+      height: 100%;
+      width: 0%;
+      background: #d6a52a;
+      transition: width 0.3s;
+    }
+
+    .mission {
+      text-align: center;
+    }
+
+    .mission-number {
+      color: #777;
+      font-size: 15px;
+      margin-bottom: 10px;
+    }
+
+    h1 {
+      font-size: 30px;
+      margin: 5px 0 10px;
+    }
+
+    .instruction {
+      color: #666;
+      margin-bottom: 25px;
+    }
+
+    .sentence {
+      background: #f5f8fa;
+      border-left: 6px solid #d6a52a;
+      border-radius: 15px;
+      padding: 25px;
+      font-size: 24px;
+      line-height: 1.5;
+      margin-bottom: 25px;
+    }
+
+    .target {
+      color: #b88400;
+      font-weight: bold;
+      text-decoration: underline;
+      text-decoration-thickness: 3px;
+      text-underline-offset: 5px;
+    }
+
+    .answers {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 14px;
+    }
+
+    button.answer {
+      padding: 17px;
+      border: 2px solid #e5e5e5;
+      background: white;
+      border-radius: 15px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+      transition: 0.2s;
+      color: #233142;
+    }
+
+    button.answer:hover {
+      transform: translateY(-2px);
+      border-color: #d6a52a;
+      background: #fffaf0;
+    }
+
+    button.correct {
+      background: #dff5e5;
+      border-color: #42a85a;
+    }
+
+    button.wrong {
+      background: #fde1e1;
+      border-color: #db5252;
+    }
+
+    .tools {
+      display: flex;
+      justify-content: center;
+      margin-top: 22px;
+    }
+
+    .hint-btn {
+      border: none;
+      background: #233142;
+      color: white;
+      border-radius: 12px;
+      padding: 12px 18px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+
+    .hint-btn:hover {
+      opacity: 0.9;
+    }
+
+    .feedback {
+      display: none;
+      margin-top: 25px;
+      padding: 20px;
+      border-radius: 15px;
+      text-align: left;
+      line-height: 1.5;
+    }
+
+    .feedback.good {
+      background: #e7f7ea;
+    }
+
+    .feedback.bad {
+      background: #fff0f0;
+    }
+
+    .feedback-title {
+      font-size: 20px;
+      font-weight: bold;
+      margin-bottom: 7px;
+    }
+
+    .next {
+      display: none;
+      margin: 20px auto 0;
+      background: #d6a52a;
+      border: none;
+      color: #222;
+      font-weight: bold;
+      font-size: 16px;
+      padding: 14px 30px;
+      border-radius: 15px;
+      cursor: pointer;
+    }
+
+    .hint-box {
+      display: none;
+      background: #fff5cf;
+      border-radius: 15px;
+      padding: 16px;
+      margin-top: 18px;
+    }
+
+    .end-screen {
+      display: none;
+      text-align: center;
+    }
+
+    .end-icon {
+      font-size: 70px;
+    }
+
+    .final-score {
+      font-size: 42px;
+      font-weight: bold;
+      color: #d6a52a;
+      margin: 20px 0;
+    }
+
+    .restart {
+      background: #233142;
+      color: white;
+      border: none;
+      padding: 15px 30px;
+      border-radius: 15px;
+      font-size: 17px;
+      font-weight: bold;
+      cursor: pointer;
+    }
+
+    @media (max-width: 650px) {
+
+      .game {
+        padding: 20px;
+      }
+
+      .answers {
+        grid-template-columns: 1fr;
+      }
+
+      .sentence {
+        font-size: 20px;
+      }
+
+      h1 {
+        font-size: 25px;
+      }
+
+    }
+
+  </style>
+</head>
+
+
+<body>
+
+<div class="game">
+
+  <div id="gameScreen">
+
+    <div class="header">
+
+      <div class="logo">
+        Clic <span>et Étudie</span>
+      </div>
+
+      <div class="stats">
+        <div class="stat">⭐ <span id="score">0</span></div>
+        <div class="stat">🔥 <span id="streak">0</span></div>
+        <div class="stat">❤️ <span id="lives">3</span></div>
+      </div>
+
+    </div>
+
+
+    <div class="progress-container">
+      <div class="progress" id="progress"></div>
+    </div>
+
+
+    <div class="mission">
+
+      <div class="mission-number" id="missionNumber"></div>
+
+      <h1>🔎 Mission Nature des mots</h1>
+
+      <div class="instruction">
+        Observe le mot souligné et retrouve sa classe grammaticale.
+      </div>
+
+
+      <div class="sentence" id="sentence"></div>
+
+
+      <div class="answers" id="answers"></div>
+
+
+      <div class="tools">
+        <button class="hint-btn" id="hintButton" onclick="showHint()">
+          💡 Utiliser un indice − 50 points
+        </button>
+      </div>
+
+
+      <div class="hint-box" id="hintBox"></div>
+
+
+      <div class="feedback" id="feedback">
+
+        <div class="feedback-title" id="feedbackTitle"></div>
+
+        <div id="feedbackText"></div>
+
+      </div>
+
+
+      <button class="next" id="nextButton" onclick="nextQuestion()">
+        Mission suivante ➜
+      </button>
+
+    </div>
+
+  </div>
+
+
+  <div class="end-screen" id="endScreen">
+
+    <div class="end-icon" id="endIcon">🏆</div>
+
+    <h1>Mission terminée !</h1>
+
+    <p id="endMessage"></p>
+
+    <div class="final-score">
+      <span id="finalScore"></span> points
+    </div>
+
+    <p id="finalDetails"></p>
+
+    <button class="restart" onclick="restartGame()">
+      🔄 Rejouer
+    </button>
+
+  </div>
+
+</div>
+
+
+<script>
+
+const questions = [
+
+  {
+    sentence: "Le <span class='target'>chat</span> dort tranquillement sur le canapé.",
+    answer: "Nom",
+    choices: ["Nom", "Verbe", "Adjectif", "Déterminant"],
+    explanation: "« chat » désigne un animal. C'est un nom commun.",
+    hint: "Ce mot désigne un être, un objet, un lieu, une idée ou un sentiment."
+  },
+
+  {
+    sentence: "<span class='target'>La</span> petite fille ouvre la fenêtre.",
+    answer: "Déterminant",
+    choices: ["Pronom", "Nom", "Déterminant", "Adverbe"],
+    explanation: "« La » accompagne le nom « fille ». C'est un déterminant.",
+    hint: "Ce mot est placé devant un nom."
+  },
+
+  {
+    sentence: "Le renard <span class='target'>court</span> dans la forêt.",
+    answer: "Verbe",
+    choices: ["Nom", "Verbe", "Préposition", "Adjectif"],
+    explanation: "« court » exprime l'action réalisée par le renard. C'est un verbe.",
+    hint: "Essaie de changer le temps de la phrase : « courait », « courra »..."
+  },
+
+  {
+    sentence: "Elle porte une robe <span class='target'>rouge</span>.",
+    answer: "Adjectif",
+    choices: ["Adjectif", "Nom", "Verbe", "Pronom"],
+    explanation: "« rouge » donne une précision sur le nom « robe ». C'est un adjectif.",
+    hint: "Ce mot donne une information supplémentaire sur un nom."
+  },
+
+  {
+    sentence: "<span class='target'>Ils</span> préparent leur cartable.",
+    answer: "Pronom",
+    choices: ["Déterminant", "Pronom", "Nom", "Adverbe"],
+    explanation: "« Ils » remplace plusieurs personnes. C'est un pronom personnel.",
+    hint: "Ce mot peut remplacer un nom ou un groupe nominal."
+  },
+
+  {
+    sentence: "Ma sœur parle <span class='target'>doucement</span>.",
+    answer: "Adverbe",
+    choices: ["Adjectif", "Adverbe", "Nom", "Conjonction"],
+    explanation: "« doucement » précise la manière dont elle parle. C'est un adverbe.",
+    hint: "Beaucoup de mots de cette classe grammaticale se terminent par « -ment »."
+  },
+
+  {
+    sentence: "Le livre est posé <span class='target'>sur</span> la table.",
+    answer: "Préposition",
+    choices: ["Préposition", "Pronom", "Adverbe", "Verbe"],
+    explanation: "« sur » introduit le groupe « la table ». C'est une préposition.",
+    hint: "Pense à : à, dans, par, pour, en, vers, avec, de, sans, sous..."
+  },
+
+  {
+    sentence: "Je voulais sortir, <span class='target'>mais</span> il pleuvait.",
+    answer: "Conjonction",
+    choices: ["Adverbe", "Préposition", "Conjonction", "Déterminant"],
+    explanation: "« mais » relie deux propositions. C'est une conjonction de coordination.",
+    hint: "Pense à la phrase : « Mais où est donc Ornicar ? »"
+  },
+
+  {
+    sentence: "Nous regardons <span class='target'>un</span> film.",
+    answer: "Déterminant",
+    choices: ["Nom", "Déterminant", "Pronom", "Verbe"],
+    explanation: "« un » accompagne le nom « film ». C'est un déterminant.",
+    hint: "Il se trouve juste devant le nom « film »."
+  },
+
+  {
+    sentence: "Le chien semble <span class='target'>fatigué</span>.",
+    answer: "Adjectif",
+    choices: ["Nom", "Adjectif", "Adverbe", "Verbe"],
+    explanation: "« fatigué » donne une caractéristique au chien. C'est un adjectif.",
+    hint: "Il décrit l'état du chien."
+  },
+
+  {
+    sentence: "Les élèves <span class='target'>terminent</span> leur exercice.",
+    answer: "Verbe",
+    choices: ["Nom", "Déterminant", "Verbe", "Pronom"],
+    explanation: "« terminent » exprime une action. C'est un verbe conjugué.",
+    hint: "Ce mot change si l'on met la phrase au passé."
+  },
+
+  {
+    sentence: "<span class='target'>Cette</span> maison appartient à mes grands-parents.",
+    answer: "Déterminant",
+    choices: ["Pronom", "Adjectif", "Déterminant", "Nom"],
+    explanation: "« Cette » accompagne le nom « maison ». C'est un déterminant démonstratif.",
+    hint: "Cherche le nom que ce mot accompagne."
+  },
+
+  {
+    sentence: "Le train arrive <span class='target'>rapidement</span>.",
+    answer: "Adverbe",
+    choices: ["Adverbe", "Adjectif", "Nom", "Préposition"],
+    explanation: "« rapidement » précise la manière dont le train arrive. C'est un adverbe.",
+    hint: "Le mot précise le sens du verbe « arrive »."
+  },
+
+  {
+    sentence: "Lina <span class='target'>et</span> Sami jouent ensemble.",
+    answer: "Conjonction",
+    choices: ["Préposition", "Conjonction", "Adverbe", "Pronom"],
+    explanation: "« et » relie « Lina » et « Sami ». C'est une conjonction de coordination.",
+    hint: "Ce petit mot sert à relier deux éléments."
+  },
+
+  {
+    sentence: "Le ballon roule <span class='target'>sous</span> la voiture.",
+    answer: "Préposition",
+    choices: ["Pronom", "Préposition", "Déterminant", "Adverbe"],
+    explanation: "« sous » introduit le groupe nominal « la voiture ». C'est une préposition.",
+    hint: "Ce mot indique ici une relation de position."
+  },
+
+  {
+    sentence: "<span class='target'>Nous</span> partirons demain matin.",
+    answer: "Pronom",
+    choices: ["Pronom", "Nom", "Déterminant", "Adjectif"],
+    explanation: "« Nous » désigne les personnes qui parlent. C'est un pronom personnel.",
+    hint: "Ce mot correspond à une personne grammaticale."
+  },
+
+  {
+    sentence: "Il observe les étoiles <span class='target'>brillantes</span>.",
+    answer: "Adjectif",
+    choices: ["Nom", "Adjectif", "Verbe", "Adverbe"],
+    explanation: "« brillantes » précise le nom « étoiles ». C'est un adjectif qualificatif.",
+    hint: "Ce mot s'accorde avec « étoiles »."
+  },
+
+  {
+    sentence: "Mon frère aime beaucoup la <span class='target'>musique</span>.",
+    answer: "Nom",
+    choices: ["Adjectif", "Nom", "Verbe", "Déterminant"],
+    explanation: "« musique » désigne une chose ou une notion. C'est un nom commun.",
+    hint: "On peut placer un déterminant devant ce mot : « la ... »"
+  },
+
+  {
+    sentence: "Tu réussiras <span class='target'>si</span> tu t'entraînes.",
+    answer: "Conjonction",
+    choices: ["Conjonction", "Préposition", "Pronom", "Adjectif"],
+    explanation: "« si » introduit ici une proposition et relie deux idées. C'est une conjonction.",
+    hint: "Ce mot permet de relier la condition « tu t'entraînes » au reste de la phrase."
+  },
+
+  {
+    sentence: "Les enfants jouent <span class='target'>dehors</span>.",
+    answer: "Adverbe",
+    choices: ["Adjectif", "Nom", "Adverbe", "Préposition"],
+    explanation: "« dehors » précise le lieu de l'action. C'est un adverbe.",
+    hint: "Ce mot précise où se déroule l'action."
+  }
+
+];
+
+
+let currentQuestion = 0;
+let score = 0;
+let lives = 3;
+let streak = 0;
+let correctAnswers = 0;
+let answered = false;
+let hintUsed = false;
+
+
+function loadQuestion() {
+
+  answered = false;
+  hintUsed = false;
+
+  document.getElementById("feedback").style.display = "none";
+  document.getElementById("nextButton").style.display = "none";
+  document.getElementById("hintBox").style.display = "none";
+  document.getElementById("hintButton").style.display = "block";
+
+  const q = questions[currentQuestion];
+
+  document.getElementById("missionNumber").textContent =
+    "Question " + (currentQuestion + 1) + " sur " + questions.length;
+
+  document.getElementById("sentence").innerHTML = q.sentence;
+
+  document.getElementById("progress").style.width =
+    ((currentQuestion) / questions.length * 100) + "%";
+
+  const answersContainer = document.getElementById("answers");
+  answersContainer.innerHTML = "";
+
+  const shuffledChoices = [...q.choices].sort(() => Math.random() - 0.5);
+
+  shuffledChoices.forEach(choice => {
+
+    const button = document.createElement("button");
+
+    button.className = "answer";
+    button.textContent = choice;
+
+    button.onclick = () => checkAnswer(choice, button);
+
+    answersContainer.appendChild(button);
+
+  });
+
+  updateStats();
+}
+
+
+function checkAnswer(choice, button) {
+
+  if (answered) return;
+
+  answered = true;
+
+  const q = questions[currentQuestion];
+
+  const buttons = document.querySelectorAll(".answer");
+
+  buttons.forEach(btn => {
+    btn.disabled = true;
+
+    if (btn.textContent === q.answer) {
+      btn.classList.add("correct");
+    }
+  });
+
+
+  const feedback = document.getElementById("feedback");
+
+  if (choice === q.answer) {
+
+    correctAnswers++;
+    streak++;
+
+    let points = 100;
+
+    if (streak >= 3) {
+      points += 50;
+    }
+
+    score += points;
+
+    feedback.className = "feedback good";
+
+    document.getElementById("feedbackTitle").textContent =
+      streak >= 3
+      ? "🔥 Excellent ! Bonus de série !"
+      : "✅ Bonne réponse !";
+
+    document.getElementById("feedbackText").textContent =
+      q.explanation + " +" + points + " points.";
+
+  }
+
+  else {
+
+    button.classList.add("wrong");
+
+    lives--;
+    streak = 0;
+
+    feedback.className = "feedback bad";
+
+    document.getElementById("feedbackTitle").textContent =
+      "❌ Pas tout à fait.";
+
+    document.getElementById("feedbackText").textContent =
+      "La bonne réponse était « " + q.answer + " ». " + q.explanation;
+
+  }
+
+  feedback.style.display = "block";
+
+  document.getElementById("hintButton").style.display = "none";
+
+  document.getElementById("nextButton").style.display = "block";
+
+  updateStats();
+
+}
+
+
+function showHint() {
+
+  if (answered || hintUsed) return;
+
+  hintUsed = true;
+
+  const hint = questions[currentQuestion].hint;
+
+  document.getElementById("hintBox").textContent =
+    "💡 Indice : " + hint;
+
+  document.getElementById("hintBox").style.display = "block";
+
+  if (score >= 50) {
+    score -= 50;
+  }
+
+  updateStats();
+
+  document.getElementById("hintButton").disabled = true;
+
+}
+
+
+function nextQuestion() {
+
+  currentQuestion++;
+
+  if (currentQuestion >= questions.length || lives <= 0) {
+    endGame();
+    return;
+  }
+
+  loadQuestion();
+
+}
+
+
+function updateStats() {
+
+  document.getElementById("score").textContent = score;
+  document.getElementById("lives").textContent = lives;
+  document.getElementById("streak").textContent = streak;
+
+}
+
+
+function endGame() {
+
+  document.getElementById("gameScreen").style.display = "none";
+  document.getElementById("endScreen").style.display = "block";
+
+  document.getElementById("finalScore").textContent = score;
+
+  const percentage =
+    Math.round((correctAnswers / questions.length) * 100);
+
+  document.getElementById("finalDetails").textContent =
+    correctAnswers + " bonne(s) réponse(s) sur " +
+    questions.length + " — " + percentage + "% de réussite.";
+
+
+  let icon;
+  let message;
+
+  if (percentage >= 90) {
+
+    icon = "🏆";
+
+    message =
+      "Bravo ! Tu maîtrises très bien la nature des mots.";
+
+  }
+
+  else if (percentage >= 70) {
+
+    icon = "⭐";
+
+    message =
+      "Très bon travail ! Encore quelques entraînements et ce sera parfait.";
+
+  }
+
+  else if (percentage >= 50) {
+
+    icon = "💪";
+
+    message =
+      "Tu progresses ! Revois les classes de mots qui t'ont posé problème puis retente la mission.";
+
+  }
+
+  else {
+
+    icon = "📚";
+
+    message =
+      "Cette notion mérite encore un peu d'entraînement. Relis ton mémo puis recommence la mission.";
+
+  }
+
+  if (lives <= 0) {
+
+    icon = "❤️";
+
+    message =
+      "Tu as utilisé tes trois vies. Pas grave : relis les explications et retente la mission !";
+
+  }
+
+  document.getElementById("endIcon").textContent = icon;
+
+  document.getElementById("endMessage").textContent = message;
+
+}
+
+
+function restartGame() {
+
+  currentQuestion = 0;
+  score = 0;
+  lives = 3;
+  streak = 0;
+  correctAnswers = 0;
+
+  document.getElementById("endScreen").style.display = "none";
+  document.getElementById("gameScreen").style.display = "block";
+
+  loadQuestion();
+
+}
+
+
+loadQuestion();
+
+</script>
+
+</body>
+</html>
