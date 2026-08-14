@@ -1,0 +1,1155 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+<title>L'Aventure de Clicky - Fractions | Clic et Étudie</title>
+
+<style>
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Arial, Helvetica, sans-serif;
+  min-height:100vh;
+  background:linear-gradient(#dff4ff,#fff7db);
+  color:#263646;
+  padding:18px;
+}
+
+.game{
+  max-width:1000px;
+  margin:auto;
+  background:white;
+  border-radius:26px;
+  padding:25px;
+  box-shadow:0 15px 40px rgba(0,0,0,.14);
+}
+
+/* ---------- HAUT DU JEU ---------- */
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:15px;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:bold;
+}
+
+.brand span{
+  color:#d4a327;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  background:#f1f3f5;
+  border-radius:14px;
+  padding:9px 14px;
+  font-weight:bold;
+}
+
+/* ---------- TITRE ---------- */
+
+h1{
+  text-align:center;
+  margin-bottom:5px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#67727d;
+  margin-bottom:25px;
+}
+
+/* ---------- CARTE ---------- */
+
+.map{
+  position:relative;
+  min-height:330px;
+  background:
+    linear-gradient(rgba(255,255,255,.1),rgba(255,255,255,.1)),
+    #d8efd2;
+  border-radius:24px;
+  border:4px solid #b7d5aa;
+  overflow:hidden;
+  padding:35px 25px;
+}
+
+.path{
+  position:absolute;
+  top:50%;
+  left:8%;
+  right:8%;
+  height:14px;
+  background:#d9bc79;
+  border-radius:20px;
+  transform:translateY(-50%);
+}
+
+.steps{
+  position:relative;
+  z-index:2;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  min-height:250px;
+}
+
+.step{
+  width:74px;
+  height:74px;
+  border-radius:50%;
+  background:#fff;
+  border:5px solid #c7cdd3;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  font-size:31px;
+  position:relative;
+  transition:.3s;
+}
+
+.step.active{
+  border-color:#d5a42b;
+  transform:scale(1.15);
+  box-shadow:0 0 0 8px rgba(213,164,43,.17);
+}
+
+.step.done{
+  border-color:#56a96a;
+  background:#e7f7ea;
+}
+
+.step.locked{
+  opacity:.55;
+}
+
+.label{
+  position:absolute;
+  top:80px;
+  white-space:nowrap;
+  font-size:13px;
+  font-weight:bold;
+}
+
+/* ---------- CLICKY ---------- */
+
+.clicky{
+  position:absolute;
+  z-index:5;
+  font-size:58px;
+  transform:translate(-50%,-50%);
+  transition:left .8s ease, top .8s ease;
+  filter:drop-shadow(0 6px 4px rgba(0,0,0,.15));
+}
+
+/* ---------- ZONE MISSION ---------- */
+
+.mission{
+  margin-top:25px;
+  background:#f8fafb;
+  border-radius:20px;
+  padding:24px;
+}
+
+.mission-title{
+  color:#a47c14;
+  text-align:center;
+  font-weight:bold;
+  margin-bottom:8px;
+}
+
+.story{
+  text-align:center;
+  line-height:1.5;
+  margin-bottom:20px;
+  font-size:17px;
+}
+
+.question{
+  text-align:center;
+  font-size:23px;
+  font-weight:bold;
+  background:white;
+  padding:20px;
+  border-left:6px solid #d5a42b;
+  border-radius:15px;
+}
+
+.answers{
+  margin-top:18px;
+  display:grid;
+  grid-template-columns:repeat(2,1fr);
+  gap:13px;
+}
+
+.answer{
+  background:white;
+  border:2px solid #e0e4e7;
+  border-radius:15px;
+  padding:16px;
+  cursor:pointer;
+  font-size:18px;
+  font-weight:bold;
+  transition:.2s;
+}
+
+.answer:hover{
+  border-color:#d5a42b;
+  transform:translateY(-2px);
+}
+
+.answer.correct{
+  background:#e6f7ea;
+  border-color:#51a768;
+}
+
+.answer.wrong{
+  background:#fde9e9;
+  border-color:#d95c5c;
+}
+
+/* ---------- BONUS ---------- */
+
+.bonus-message{
+  display:none;
+  margin-top:18px;
+  text-align:center;
+  background:#fff5cc;
+  border-radius:14px;
+  padding:14px;
+  font-weight:bold;
+}
+
+.feedback{
+  display:none;
+  margin-top:18px;
+  padding:17px;
+  border-radius:15px;
+  line-height:1.5;
+}
+
+.feedback.good{
+  background:#e5f7e9;
+}
+
+.feedback.bad{
+  background:#fff0f0;
+}
+
+/* ---------- BOUTONS ---------- */
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+button{
+  border:none;
+  border-radius:13px;
+  padding:13px 20px;
+  font-size:16px;
+  font-weight:bold;
+  cursor:pointer;
+}
+
+.hint{
+  background:#263646;
+  color:white;
+}
+
+.next{
+  background:#d5a42b;
+  color:#263646;
+  display:none;
+}
+
+/* ---------- ÉCRAN FINAL ---------- */
+
+.end{
+  display:none;
+  text-align:center;
+  padding:25px;
+}
+
+.endIcon{
+  font-size:80px;
+}
+
+.bigScore{
+  color:#d5a42b;
+  font-size:44px;
+  font-weight:bold;
+  margin:15px;
+}
+
+.restart{
+  background:#263646;
+  color:white;
+}
+
+/* ---------- MOBILE ---------- */
+
+@media(max-width:700px){
+
+  .game{
+    padding:16px;
+  }
+
+  .map{
+    min-height:260px;
+    padding:25px 10px;
+  }
+
+  .steps{
+    min-height:190px;
+  }
+
+  .step{
+    width:48px;
+    height:48px;
+    font-size:22px;
+    border-width:3px;
+  }
+
+  .label{
+    display:none;
+  }
+
+  .clicky{
+    font-size:42px;
+  }
+
+  .answers{
+    grid-template-columns:1fr;
+  }
+
+}
+
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<div id="gameScreen">
+
+  <div class="topbar">
+
+    <div class="brand">
+      Clic <span>et Étudie</span>
+    </div>
+
+    <div class="stats">
+
+      <div class="stat">
+        ⭐ <span id="stars">0</span>
+      </div>
+
+      <div class="stat">
+        🔥 <span id="streak">0</span>
+      </div>
+
+      <div class="stat">
+        ❤️ <span id="lives">3</span>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <h1>🗺️ L'Aventure de Clicky</h1>
+
+  <div class="subtitle">
+    Le Royaume des fractions
+  </div>
+
+
+  <!-- CARTE -->
+
+  <div class="map">
+
+    <div class="path"></div>
+
+    <div class="clicky" id="clicky">
+      🦊
+    </div>
+
+    <div class="steps">
+
+      <div class="step active" id="step0">
+        🏠
+        <div class="label">Départ</div>
+      </div>
+
+      <div class="step locked" id="step1">
+        🌳
+        <div class="label">Forêt</div>
+      </div>
+
+      <div class="step locked" id="step2">
+        🌉
+        <div class="label">Pont</div>
+      </div>
+
+      <div class="step locked" id="step3">
+        🎁
+        <div class="label">Coffre</div>
+      </div>
+
+      <div class="step locked" id="step4">
+        🏰
+        <div class="label">Château</div>
+      </div>
+
+      <div class="step locked" id="step5">
+        💎
+        <div class="label">Trésor</div>
+      </div>
+
+    </div>
+
+  </div>
+
+
+  <!-- MISSION -->
+
+  <div class="mission">
+
+    <div class="mission-title" id="missionTitle"></div>
+
+    <div class="story" id="story"></div>
+
+    <div class="question" id="question"></div>
+
+    <div class="answers" id="answers"></div>
+
+
+    <div class="bonus-message" id="bonus"></div>
+
+
+    <div class="feedback" id="feedback"></div>
+
+
+    <div class="actions">
+
+      <button class="hint" id="hintButton" onclick="showHint()">
+        💡 Indice − 50 ⭐
+      </button>
+
+      <button class="next" id="nextButton" onclick="nextMission()">
+        Continuer l'aventure ➜
+      </button>
+
+    </div>
+
+  </div>
+
+</div>
+
+
+<!-- FIN -->
+
+<div class="end" id="endScreen">
+
+  <div class="endIcon">
+    🏆
+  </div>
+
+  <h1>Le trésor est à toi !</h1>
+
+  <p>
+    Clicky a réussi à traverser le Royaume des fractions.
+  </p>
+
+  <div class="bigScore">
+    ⭐ <span id="finalScore"></span>
+  </div>
+
+  <p id="finalMessage"></p>
+
+  <button class="restart" onclick="restartGame()">
+    🔄 Rejouer l'aventure
+  </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* ======================================================
+   MISSIONS
+====================================================== */
+
+const missions = [
+
+{
+title:"Mission 1 — La porte de la forêt",
+
+story:
+"Clicky arrive devant une grande porte. Une inscription indique : « Seuls ceux qui reconnaissent une fraction peuvent entrer. »",
+
+question:
+"Quelle fraction représente trois parts sur quatre ?",
+
+choices:[
+"3/4",
+"4/3",
+"3/7",
+"1/4"
+],
+
+answer:"3/4",
+
+hint:
+"Le nombre de parts choisies se place au-dessus, et le nombre total de parts en dessous.",
+
+explanation:
+"3/4 signifie que l'on prend 3 parts parmi 4 parts égales."
+},
+
+{
+title:"Mission 2 — Les fruits magiques",
+
+story:
+"Dans la forêt, Clicky découvre 8 fruits magiques. Il doit en récupérer exactement la moitié.",
+
+question:
+"Quelle fraction représente la moitié de 8 fruits ?",
+
+choices:[
+"1/8",
+"2/8",
+"4/8",
+"8/4"
+],
+
+answer:"4/8",
+
+hint:
+"La moitié signifie que l'on partage la quantité en deux parts égales.",
+
+explanation:
+"4 fruits sur 8 représentent la moitié : 4/8 = 1/2."
+},
+
+{
+title:"Mission 3 — Le pont suspendu",
+
+story:
+"Le pont est bloqué. Pour le traverser, Clicky doit identifier deux fractions qui représentent la même quantité.",
+
+question:
+"Quelle fraction est équivalente à 1/2 ?",
+
+choices:[
+"2/4",
+"2/3",
+"1/4",
+"3/4"
+],
+
+answer:"2/4",
+
+hint:
+"Multiplie le numérateur et le dénominateur de 1/2 par le même nombre.",
+
+explanation:
+"1/2 = 2/4. Les deux fractions représentent exactement la même quantité."
+},
+
+{
+title:"Mission 4 — Le coffre mystérieux",
+
+story:
+"Un coffre apparaît sur le chemin. Il contient un bonus, mais Clicky doit comparer deux fractions pour l'ouvrir.",
+
+question:
+"Quelle fraction est la plus grande ?",
+
+choices:[
+"1/4",
+"3/4",
+"2/4",
+"Elles sont égales"
+],
+
+answer:"3/4",
+
+hint:
+"Les fractions ont le même dénominateur. Compare donc les numérateurs.",
+
+explanation:
+"Lorsque les dénominateurs sont identiques, la fraction ayant le plus grand numérateur est la plus grande.",
+
+bonus:true
+},
+
+{
+title:"Mission 5 — La porte du château",
+
+story:
+"Clicky arrive devant le château. La porte ne s'ouvrira que s'il trouve la fraction égale à un entier.",
+
+question:
+"Quelle fraction est égale à 1 ?",
+
+choices:[
+"3/4",
+"4/4",
+"4/3",
+"1/4"
+],
+
+answer:"4/4",
+
+hint:
+"Une fraction est égale à 1 lorsque le numérateur et le dénominateur sont identiques.",
+
+explanation:
+"4/4 = 1 car toutes les parts de l'unité sont prises."
+},
+
+{
+title:"Défi final — Le trésor",
+
+story:
+"Le trésor est tout près ! Une dernière énigme protège le diamant du Royaume des fractions.",
+
+question:
+"Quelle affirmation est correcte ?",
+
+choices:[
+"5/4 est inférieur à 1",
+"3/3 est inférieur à 1",
+"2/5 est supérieur à 1",
+"5/4 est supérieur à 1"
+],
+
+answer:
+"5/4 est supérieur à 1",
+
+hint:
+"Une fraction est supérieure à 1 lorsque son numérateur est plus grand que son dénominateur.",
+
+explanation:
+"5/4 est supérieur à 1 car le numérateur 5 est plus grand que le dénominateur 4."
+}
+
+];
+
+
+/* ======================================================
+   VARIABLES
+====================================================== */
+
+let current = 0;
+
+let stars = 0;
+
+let lives = 3;
+
+let streak = 0;
+
+let answered = false;
+
+
+/* ======================================================
+   POSITION CLICKY
+====================================================== */
+
+function moveClicky(){
+
+  const step =
+    document.getElementById("step" + current);
+
+  const map =
+    document.querySelector(".map");
+
+  const stepRect =
+    step.getBoundingClientRect();
+
+  const mapRect =
+    map.getBoundingClientRect();
+
+  const x =
+    stepRect.left -
+    mapRect.left +
+    stepRect.width / 2;
+
+  const y =
+    stepRect.top -
+    mapRect.top -
+    15;
+
+  const clicky =
+    document.getElementById("clicky");
+
+  clicky.style.left =
+    x + "px";
+
+  clicky.style.top =
+    y + "px";
+
+}
+
+
+/* ======================================================
+   CHARGER MISSION
+====================================================== */
+
+function loadMission(){
+
+  answered = false;
+
+  const mission =
+    missions[current];
+
+
+  document.getElementById("missionTitle").textContent =
+    mission.title;
+
+  document.getElementById("story").textContent =
+    mission.story;
+
+  document.getElementById("question").textContent =
+    mission.question;
+
+
+  document.getElementById("feedback").style.display =
+    "none";
+
+  document.getElementById("bonus").style.display =
+    "none";
+
+  document.getElementById("nextButton").style.display =
+    "none";
+
+  document.getElementById("hintButton").disabled =
+    false;
+
+
+  const answers =
+    document.getElementById("answers");
+
+  answers.innerHTML =
+    "";
+
+
+  mission.choices.forEach(choice => {
+
+    const button =
+      document.createElement("button");
+
+    button.className =
+      "answer";
+
+    button.textContent =
+      choice;
+
+    button.onclick =
+      () => checkAnswer(choice,button);
+
+    answers.appendChild(button);
+
+  });
+
+
+  updateMap();
+
+  updateStats();
+
+  setTimeout(moveClicky,100);
+
+}
+
+
+/* ======================================================
+   RÉPONSE
+====================================================== */
+
+function checkAnswer(choice,button){
+
+  if(answered) return;
+
+  answered = true;
+
+
+  const mission =
+    missions[current];
+
+
+  const buttons =
+    document.querySelectorAll(".answer");
+
+
+  buttons.forEach(btn => {
+
+    btn.disabled =
+      true;
+
+    if(btn.textContent === mission.answer){
+
+      btn.classList.add("correct");
+
+    }
+
+  });
+
+
+  const feedback =
+    document.getElementById("feedback");
+
+
+  if(choice === mission.answer){
+
+    streak++;
+
+    let points =
+      150;
+
+
+    if(streak >= 3){
+
+      points +=
+        50;
+
+    }
+
+
+    stars +=
+      points;
+
+
+    button.classList.add("correct");
+
+
+    feedback.className =
+      "feedback good";
+
+    feedback.innerHTML =
+      "<strong>✅ Bravo !</strong><br>" +
+      mission.explanation +
+      "<br><br>⭐ +" +
+      points +
+      " étoiles";
+
+
+    if(mission.bonus){
+
+      stars +=
+        200;
+
+      const bonus =
+        document.getElementById("bonus");
+
+      bonus.style.display =
+        "block";
+
+      bonus.innerHTML =
+        "🎁 Coffre ouvert ! <strong>+200 étoiles bonus !</strong>";
+
+    }
+
+  }
+
+  else{
+
+    lives--;
+
+    streak =
+      0;
+
+    button.classList.add("wrong");
+
+
+    feedback.className =
+      "feedback bad";
+
+    feedback.innerHTML =
+      "<strong>❌ Ce n'est pas la bonne réponse.</strong><br>" +
+      mission.explanation;
+
+  }
+
+
+  feedback.style.display =
+    "block";
+
+
+  document.getElementById("hintButton").disabled =
+    true;
+
+
+  document.getElementById("nextButton").style.display =
+    "inline-block";
+
+
+  updateStats();
+
+}
+
+
+/* ======================================================
+   INDICE
+====================================================== */
+
+function showHint(){
+
+  const mission =
+    missions[current];
+
+
+  const feedback =
+    document.getElementById("feedback");
+
+
+  feedback.className =
+    "feedback";
+
+  feedback.style.display =
+    "block";
+
+  feedback.style.background =
+    "#fff5ce";
+
+
+  feedback.innerHTML =
+    "💡 <strong>Indice :</strong><br>" +
+    mission.hint;
+
+
+  if(stars >= 50){
+
+    stars -=
+      50;
+
+  }
+
+
+  document.getElementById("hintButton").disabled =
+    true;
+
+
+  updateStats();
+
+}
+
+
+/* ======================================================
+   MISSION SUIVANTE
+====================================================== */
+
+function nextMission(){
+
+  document
+    .getElementById("step" + current)
+    .classList
+    .add("done");
+
+
+  current++;
+
+
+  if(lives <= 0){
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  if(current >= missions.length){
+
+    finishGame();
+
+    return;
+
+  }
+
+
+  loadMission();
+
+}
+
+
+/* ======================================================
+   CARTE
+====================================================== */
+
+function updateMap(){
+
+  for(let i=0;i<6;i++){
+
+    const step =
+      document.getElementById("step"+i);
+
+    step.classList.remove("active");
+
+
+    if(i < current){
+
+      step.classList.remove("locked");
+
+      step.classList.add("done");
+
+    }
+
+    else if(i === current){
+
+      step.classList.remove("locked");
+
+      step.classList.add("active");
+
+    }
+
+    else{
+
+      step.classList.add("locked");
+
+    }
+
+  }
+
+}
+
+
+/* ======================================================
+   STATS
+====================================================== */
+
+function updateStats(){
+
+  document.getElementById("stars").textContent =
+    stars;
+
+  document.getElementById("lives").textContent =
+    lives;
+
+  document.getElementById("streak").textContent =
+    streak;
+
+}
+
+
+/* ======================================================
+   FIN
+====================================================== */
+
+function finishGame(){
+
+  document.getElementById("gameScreen").style.display =
+    "none";
+
+  document.getElementById("endScreen").style.display =
+    "block";
+
+
+  document.getElementById("finalScore").textContent =
+    stars;
+
+
+  let message =
+    "";
+
+
+  if(lives <= 0){
+
+    message =
+      "Clicky a besoin d'un nouvel essai pour atteindre le trésor. Relis les explications et repars à l'aventure !";
+
+  }
+
+  else if(stars >= 1100){
+
+    message =
+      "Incroyable ! Tu es un véritable explorateur des fractions !";
+
+  }
+
+  else if(stars >= 700){
+
+    message =
+      "Très belle aventure ! Tu maîtrises déjà beaucoup de choses sur les fractions.";
+
+  }
+
+  else{
+
+    message =
+      "Mission réussie ! Rejoue pour récupérer encore plus d'étoiles.";
+
+  }
+
+
+  document.getElementById("finalMessage").textContent =
+    message;
+
+}
+
+
+/* ======================================================
+   REJOUER
+====================================================== */
+
+function restartGame(){
+
+  current =
+    0;
+
+  stars =
+    0;
+
+  lives =
+    3;
+
+  streak =
+    0;
+
+
+  document.getElementById("endScreen").style.display =
+    "none";
+
+  document.getElementById("gameScreen").style.display =
+    "block";
+
+
+  loadMission();
+
+}
+
+
+/* ======================================================
+   DÉMARRAGE
+====================================================== */
+
+window.addEventListener("resize",moveClicky);
+
+loadMission();
+
+</script>
+
+</body>
+</html>
