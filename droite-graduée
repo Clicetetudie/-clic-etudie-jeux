@@ -1,0 +1,870 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<title>La droite graduée — Clic et Étudie</title>
+
+<style>
+:root{
+  --ink:#24304a;
+  --muted:#667085;
+  --primary:#6c63ff;
+  --primary2:#8b83ff;
+  --good:#18864b;
+  --bad:#c83d4a;
+  --panel:#fff;
+  --bg:#f4f6fb;
+  --line:#27324a;
+}
+
+*{box-sizing:border-box}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,-apple-system,Segoe UI,Roboto,Arial,sans-serif;
+  background:linear-gradient(135deg,#f7f4ff,#eef8ff);
+  color:var(--ink);
+  min-height:100vh;
+  display:grid;
+  place-items:center;
+  padding:22px;
+}
+
+.app{
+  width:min(980px,100%);
+  background:rgba(255,255,255,.95);
+  border-radius:24px;
+  box-shadow:0 20px 55px rgba(37,42,68,.13);
+  overflow:hidden;
+  border:1px solid rgba(108,99,255,.12);
+}
+
+header{
+  padding:24px 28px 18px;
+  background:linear-gradient(120deg,#655cf6,#8c83ff);
+  color:#fff;
+  display:flex;
+  align-items:center;
+  justify-content:space-between;
+  gap:16px;
+  flex-wrap:wrap;
+}
+
+header h1{
+  font-size:clamp(1.35rem,3vw,2rem);
+  margin:0;
+}
+
+.subtitle{
+  opacity:.9;
+  margin-top:4px;
+  font-size:.95rem;
+}
+
+.scorebox{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.pill{
+  background:rgba(255,255,255,.18);
+  padding:9px 13px;
+  border-radius:999px;
+  font-weight:700;
+  backdrop-filter:blur(5px);
+}
+
+main{
+  padding:24px 28px 30px;
+}
+
+.controls{
+  display:flex;
+  gap:12px;
+  flex-wrap:wrap;
+  align-items:end;
+  margin-bottom:20px;
+}
+
+label{
+  font-size:.82rem;
+  font-weight:700;
+  color:var(--muted);
+  display:block;
+  margin:0 0 6px 2px;
+}
+
+select,button{
+  font:inherit;
+}
+
+.select-wrap select{
+  border:1px solid #d7dbea;
+  background:white;
+  padding:11px 38px 11px 12px;
+  border-radius:12px;
+  color:var(--ink);
+  font-weight:650;
+}
+
+button{
+  border:none;
+  border-radius:12px;
+  padding:11px 16px;
+  font-weight:800;
+  cursor:pointer;
+  transition:.18s transform,.18s box-shadow;
+}
+
+.primary{
+  background:var(--primary);
+  color:white;
+  box-shadow:0 7px 18px rgba(108,99,255,.26);
+}
+
+button:hover{
+  transform:translateY(-1px);
+}
+
+.question{
+  text-align:center;
+  font-size:clamp(1.05rem,2.4vw,1.35rem);
+  font-weight:750;
+  margin:8px 0 4px;
+}
+
+.target{
+  display:inline-grid;
+  place-items:center;
+  min-width:95px;
+  padding:8px 16px;
+  border-radius:14px;
+  background:#f0eeff;
+  color:#554bea;
+  font-size:1.55rem;
+  margin-left:6px;
+}
+
+.hint{
+  text-align:center;
+  color:var(--muted);
+  margin-bottom:18px;
+  font-size:.92rem;
+}
+
+.numberline-card{
+  background:#fbfcff;
+  border:1px solid #e4e7f0;
+  border-radius:18px;
+  padding:24px 18px 30px;
+  overflow-x:auto;
+  position:relative;
+}
+
+.numberline{
+  min-width:680px;
+  height:180px;
+  position:relative;
+  margin:auto;
+  user-select:none;
+  touch-action:manipulation;
+}
+
+.axis{
+  position:absolute;
+  left:5%;
+  right:5%;
+  top:85px;
+  height:4px;
+  background:var(--line);
+  border-radius:4px;
+}
+
+.axis:after{
+  content:"";
+  position:absolute;
+  right:-2px;
+  top:-7px;
+  border-left:14px solid var(--line);
+  border-top:9px solid transparent;
+  border-bottom:9px solid transparent;
+}
+
+.ticks{
+  position:absolute;
+  left:5%;
+  right:5%;
+  top:0;
+  height:100%;
+}
+
+.tick{
+  position:absolute;
+  top:66px;
+  width:2px;
+  height:40px;
+  background:var(--line);
+  transform:translateX(-50%);
+  cursor:pointer;
+}
+
+.tick.minor{
+  top:75px;
+  height:22px;
+  background:#5a6478;
+}
+
+.tick:hover{
+  background:var(--primary);
+  width:4px;
+}
+
+.tick::before{
+  content:"";
+  position:absolute;
+  width:34px;
+  height:60px;
+  left:50%;
+  top:-14px;
+  transform:translateX(-50%);
+}
+
+.label-num{
+  position:absolute;
+  top:112px;
+  transform:translateX(-50%);
+  font-weight:750;
+  font-size:.93rem;
+  white-space:nowrap;
+}
+
+.marker{
+  position:absolute;
+  top:26px;
+  transform:translateX(-50%);
+  display:none;
+  pointer-events:none;
+}
+
+.marker.show{
+  display:block;
+}
+
+.pin{
+  width:26px;
+  height:26px;
+  background:var(--primary);
+  border-radius:50% 50% 50% 0;
+  transform:rotate(-45deg);
+  margin:auto;
+  box-shadow:0 5px 10px rgba(0,0,0,.18);
+}
+
+.pin::after{
+  content:"";
+  width:10px;
+  height:10px;
+  background:#fff;
+  border-radius:50%;
+  position:absolute;
+  left:8px;
+  top:8px;
+}
+
+.stem{
+  height:30px;
+  width:3px;
+  background:var(--primary);
+  margin:-2px auto 0;
+}
+
+.feedback{
+  min-height:48px;
+  display:grid;
+  place-items:center;
+  text-align:center;
+  font-weight:800;
+  margin-top:16px;
+}
+
+.feedback.good{
+  color:var(--good);
+}
+
+.feedback.bad{
+  color:var(--bad);
+}
+
+.footer-actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+}
+
+.secondary{
+  background:#eef0f7;
+  color:var(--ink);
+}
+
+.explain{
+  margin-top:20px;
+  background:#f7f8fc;
+  border-left:4px solid var(--primary);
+  border-radius:10px;
+  padding:13px 15px;
+  color:#4a5368;
+  font-size:.92rem;
+  line-height:1.5;
+}
+
+@media(max-width:620px){
+  body{padding:10px}
+  .app{border-radius:18px}
+  header,main{
+    padding-left:17px;
+    padding-right:17px;
+  }
+  .numberline-card{
+    padding-left:8px;
+    padding-right:8px;
+  }
+}
+</style>
+</head>
+
+<body>
+
+<div class="app">
+
+<header>
+
+  <div>
+    <h1>La droite graduée</h1>
+    <div class="subtitle">
+      Repère le nombre demandé sur la droite.
+    </div>
+  </div>
+
+  <div class="scorebox">
+    <div class="pill">
+      Score : <span id="score">0</span>
+    </div>
+
+    <div class="pill">
+      Série : <span id="streak">0</span>
+    </div>
+
+    <div class="pill">
+      Question : <span id="count">1</span>/10
+    </div>
+  </div>
+
+</header>
+
+<main>
+
+  <div class="controls">
+
+    <div class="select-wrap">
+
+      <label for="level">
+        Niveau
+      </label>
+
+      <select id="level">
+        <option value="integers">Entiers</option>
+        <option value="tenths" selected>Dixièmes</option>
+        <option value="hundredths">Centièmes</option>
+        <option value="mixed">Mélangé</option>
+      </select>
+
+    </div>
+
+    <button class="primary" id="newGame">
+      Nouvelle partie
+    </button>
+
+  </div>
+
+
+  <div class="question">
+    Clique sur la graduation correspondant à
+    <span class="target" id="target">2,4</span>
+  </div>
+
+  <div class="hint">
+    Observe les nombres déjà indiqués et détermine la valeur d'une graduation.
+  </div>
+
+
+  <section class="numberline-card">
+
+    <div class="numberline" id="numberline">
+
+      <div class="axis"></div>
+
+      <div class="ticks" id="ticks"></div>
+
+      <div class="marker" id="marker">
+        <div class="pin"></div>
+        <div class="stem"></div>
+      </div>
+
+    </div>
+
+  </section>
+
+
+  <div
+    class="feedback"
+    id="feedback"
+    aria-live="polite">
+  </div>
+
+
+  <div class="footer-actions">
+
+    <button
+      class="secondary"
+      id="retry">
+
+      Recommencer la question
+
+    </button>
+
+
+    <button
+      class="primary"
+      id="next"
+      disabled>
+
+      Question suivante
+
+    </button>
+
+  </div>
+
+
+  <div class="explain" id="explain">
+    Conseil : calcule d'abord l'écart entre deux nombres affichés,
+    puis compte le nombre d'intervalles.
+  </div>
+
+</main>
+
+</div>
+
+
+<script>
+
+const $ = s => document.querySelector(s);
+
+const state = {
+  score:0,
+  streak:0,
+  count:1,
+  answered:false,
+  config:null,
+  targetIndex:0
+};
+
+
+const fmt = (n,d) =>
+  n.toLocaleString(
+    'fr-FR',
+    {
+      minimumFractionDigits:d,
+      maximumFractionDigits:d
+    }
+  );
+
+
+function randInt(a,b){
+  return Math.floor(
+    Math.random()*(b-a+1)
+  )+a;
+}
+
+
+function chooseConfig(){
+
+  let level =
+    $('#level').value;
+
+
+  if(level === 'mixed'){
+
+    level =
+      ['integers','tenths','hundredths']
+      [randInt(0,2)];
+
+  }
+
+
+  if(level === 'integers'){
+
+    const step =
+      [1,2,5][randInt(0,2)];
+
+    const start =
+      randInt(-4,8)*step;
+
+    return {
+      start,
+      step,
+      decimals:0,
+      total:10,
+      labelEvery:[2,5][randInt(0,1)]
+    };
+
+  }
+
+
+  if(level === 'tenths'){
+
+    const step =
+      [0.1,0.2,0.5][randInt(0,2)];
+
+    const start =
+      randInt(-10,30)*step;
+
+    return {
+      start:+start.toFixed(2),
+      step,
+      decimals:1,
+      total:10,
+      labelEvery:[2,5][randInt(0,1)]
+    };
+
+  }
+
+
+  const step =
+    [0.01,0.02,0.05][randInt(0,2)];
+
+  const start =
+    randInt(0,40)*step;
+
+
+  return {
+    start:+start.toFixed(3),
+    step,
+    decimals:2,
+    total:10,
+    labelEvery:[2,5][randInt(0,1)]
+  };
+
+}
+
+
+function buildQuestion(){
+
+  state.answered = false;
+
+  $('#next').disabled = true;
+
+  $('#feedback').textContent = '';
+
+  $('#feedback').className = 'feedback';
+
+  $('#marker').classList.remove('show');
+
+
+  const c =
+    chooseConfig();
+
+
+  state.config =
+    c;
+
+
+  state.targetIndex =
+    randInt(1,c.total-1);
+
+
+  $('#target').textContent =
+    fmt(
+      c.start +
+      c.step *
+      state.targetIndex,
+      c.decimals
+    );
+
+
+  const ticks =
+    $('#ticks');
+
+
+  ticks.innerHTML =
+    '';
+
+
+  for(let i=0;i<=c.total;i++){
+
+    const t =
+      document.createElement('div');
+
+
+    t.className =
+      'tick ' +
+      (
+        i%c.labelEvery===0
+        ? ''
+        : 'minor'
+      );
+
+
+    t.style.left =
+      (i/c.total*100)+'%';
+
+
+    t.dataset.index =
+      i;
+
+
+    t.setAttribute(
+      'role',
+      'button'
+    );
+
+
+    t.setAttribute(
+      'aria-label',
+      'Graduation '+(i+1)
+    );
+
+
+    t.addEventListener(
+      'click',
+      ()=>answer(i)
+    );
+
+
+    ticks.appendChild(t);
+
+
+    if(i%c.labelEvery===0){
+
+      const lab =
+        document.createElement('div');
+
+
+      lab.className =
+        'label-num';
+
+
+      lab.style.left =
+        t.style.left;
+
+
+      lab.textContent =
+        fmt(
+          c.start +
+          c.step*i,
+          c.decimals
+        );
+
+
+      ticks.appendChild(lab);
+
+    }
+
+  }
+
+
+  $('#explain').textContent =
+    `Entre deux petites graduations, on avance de ${fmt(c.step,c.decimals)}.`;
+
+}
+
+
+function answer(i){
+
+  if(state.answered)
+    return;
+
+
+  state.answered =
+    true;
+
+
+  const ok =
+    i === state.targetIndex;
+
+
+  const marker =
+    $('#marker');
+
+
+  marker.style.left =
+    (
+      5 +
+      (.9*i/state.config.total)*100
+    )+'%';
+
+
+  marker.classList.add(
+    'show'
+  );
+
+
+  const fb =
+    $('#feedback');
+
+
+  if(ok){
+
+    state.score +=
+      10;
+
+
+    state.streak++;
+
+
+    fb.textContent =
+      'Bravo ! Tu as placé le nombre au bon endroit.';
+
+
+    fb.className =
+      'feedback good';
+
+  }
+
+  else{
+
+    state.streak =
+      0;
+
+
+    const val =
+      state.config.start +
+      state.config.step*i;
+
+
+    fb.textContent =
+      `Pas tout à fait : tu as choisi ${fmt(val,state.config.decimals)}. La bonne réponse est ${fmt(state.config.start+state.config.step*state.targetIndex,state.config.decimals)}.`;
+
+
+    fb.className =
+      'feedback bad';
+
+
+    setTimeout(()=>{
+
+      marker.style.left =
+        (
+          5 +
+          (.9*state.targetIndex/state.config.total)*100
+        )+'%';
+
+    },650);
+
+  }
+
+
+  $('#score').textContent =
+    state.score;
+
+
+  $('#streak').textContent =
+    state.streak;
+
+
+  $('#next').disabled =
+    false;
+
+}
+
+
+function resetGame(){
+
+  state.score =
+    0;
+
+  state.streak =
+    0;
+
+  state.count =
+    1;
+
+
+  $('#score').textContent =
+    0;
+
+
+  $('#streak').textContent =
+    0;
+
+
+  $('#count').textContent =
+    1;
+
+
+  buildQuestion();
+
+}
+
+
+$('#next').addEventListener(
+  'click',
+  ()=>{
+
+    if(state.count>=10){
+
+      $('#feedback').textContent =
+        `Partie terminée ! Ton score est de ${state.score}/100.`;
+
+
+      $('#feedback').className =
+        'feedback good';
+
+
+      $('#next').disabled =
+        true;
+
+
+      return;
+
+    }
+
+
+    state.count++;
+
+
+    $('#count').textContent =
+      state.count;
+
+
+    buildQuestion();
+
+  }
+);
+
+
+$('#retry').addEventListener(
+  'click',
+  buildQuestion
+);
+
+
+$('#newGame').addEventListener(
+  'click',
+  resetGame
+);
+
+
+$('#level').addEventListener(
+  'change',
+  resetGame
+);
+
+
+resetGame();
+
+</script>
+
+</body>
+</html>
