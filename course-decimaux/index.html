@@ -1,0 +1,1072 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>La Course des Décimaux | Clic et Étudie</title>
+
+<style>
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  min-height:100vh;
+  font-family:Arial,Helvetica,sans-serif;
+  background:linear-gradient(135deg,#f7f4ff,#fff6df);
+  color:#24324a;
+  padding:18px;
+}
+
+.game{
+  width:min(1000px,100%);
+  margin:auto;
+  background:white;
+  border-radius:26px;
+  box-shadow:0 16px 45px rgba(0,0,0,.12);
+  padding:24px;
+}
+
+.topbar{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.brand{
+  font-size:22px;
+  font-weight:800;
+}
+
+.brand span{
+  color:#d5a42b;
+}
+
+.stats{
+  display:flex;
+  gap:10px;
+  flex-wrap:wrap;
+}
+
+.stat{
+  padding:9px 14px;
+  border-radius:14px;
+  background:#f2f4f6;
+  font-weight:800;
+}
+
+.progress-wrap{
+  height:12px;
+  background:#ececec;
+  border-radius:20px;
+  overflow:hidden;
+  margin:18px 0 24px;
+}
+
+.progress{
+  height:100%;
+  width:0;
+  background:#d5a42b;
+  transition:.3s;
+}
+
+h1{
+  text-align:center;
+  margin-bottom:6px;
+}
+
+.subtitle{
+  text-align:center;
+  color:#68717d;
+  margin-bottom:22px;
+}
+
+.round-title{
+  text-align:center;
+  font-weight:800;
+  color:#9a7110;
+  margin-bottom:10px;
+}
+
+.instruction{
+  background:#f8fafb;
+  border-left:6px solid #d5a42b;
+  padding:16px;
+  border-radius:14px;
+  text-align:center;
+  font-size:18px;
+  margin-bottom:20px;
+}
+
+.track{
+  background:linear-gradient(#d9efd7,#eef8e8);
+  border:3px solid #bddab8;
+  border-radius:22px;
+  padding:22px;
+  min-height:240px;
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+.racer{
+  background:white;
+  border:2px solid #dfe3e8;
+  border-radius:16px;
+  padding:14px 16px;
+  display:flex;
+  align-items:center;
+  gap:14px;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.racer:hover{
+  transform:translateX(4px);
+  border-color:#d5a42b;
+}
+
+.racer.selected{
+  outline:4px solid rgba(213,164,43,.25);
+  border-color:#d5a42b;
+}
+
+.racer.correct{
+  background:#e8f7eb;
+  border-color:#55a86a;
+}
+
+.racer.wrong{
+  background:#fdeaea;
+  border-color:#d95c5c;
+}
+
+.runner{
+  font-size:30px;
+}
+
+.number{
+  font-size:24px;
+  font-weight:900;
+  flex:1;
+}
+
+.position{
+  font-weight:800;
+  color:#6a7280;
+}
+
+.compare-box{
+  display:grid;
+  grid-template-columns:1fr auto 1fr;
+  align-items:center;
+  gap:16px;
+  margin:25px auto;
+  max-width:720px;
+}
+
+.compare-card{
+  background:white;
+  border:3px solid #e0e4e8;
+  border-radius:18px;
+  padding:24px;
+  text-align:center;
+  font-size:32px;
+  font-weight:900;
+  cursor:pointer;
+  transition:.2s;
+}
+
+.compare-card:hover{
+  border-color:#d5a42b;
+  transform:scale(1.03);
+}
+
+.vs{
+  font-size:22px;
+  font-weight:bold;
+  color:#8a8f98;
+}
+
+.symbol-buttons{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:14px;
+}
+
+.symbol-btn{
+  min-width:80px;
+  font-size:28px;
+  border:none;
+  border-radius:14px;
+  padding:12px;
+  cursor:pointer;
+  background:#24324a;
+  color:white;
+  font-weight:900;
+}
+
+.intruder-grid{
+  display:grid;
+  grid-template-columns:repeat(4,1fr);
+  gap:14px;
+}
+
+.intruder{
+  border:3px solid #e0e4e8;
+  border-radius:18px;
+  background:white;
+  padding:22px 10px;
+  font-size:25px;
+  font-weight:900;
+  cursor:pointer;
+}
+
+.intruder:hover{
+  border-color:#d5a42b;
+}
+
+.actions{
+  display:flex;
+  justify-content:center;
+  gap:12px;
+  flex-wrap:wrap;
+  margin-top:20px;
+}
+
+button{
+  border:none;
+  border-radius:13px;
+  padding:13px 18px;
+  font-size:16px;
+  font-weight:800;
+  cursor:pointer;
+}
+
+.primary{
+  background:#d5a42b;
+  color:#263646;
+}
+
+.secondary{
+  background:#263646;
+  color:white;
+}
+
+.ghost{
+  background:#eef1f4;
+  color:#263646;
+}
+
+.feedback{
+  display:none;
+  margin-top:18px;
+  padding:17px;
+  border-radius:15px;
+  line-height:1.5;
+}
+
+.feedback.good{
+  background:#e8f7eb;
+}
+
+.feedback.bad{
+  background:#fff0f0;
+}
+
+.hint-box{
+  display:none;
+  background:#fff5cf;
+  border-radius:14px;
+  padding:15px;
+  margin-top:15px;
+}
+
+.end{
+  display:none;
+  text-align:center;
+  padding:30px 10px;
+}
+
+.end-icon{
+  font-size:80px;
+}
+
+.big-score{
+  font-size:44px;
+  font-weight:900;
+  color:#d5a42b;
+  margin:18px 0;
+}
+
+@media(max-width:700px){
+
+  .compare-box{
+    grid-template-columns:1fr;
+  }
+
+  .vs{
+    text-align:center;
+  }
+
+  .intruder-grid{
+    grid-template-columns:repeat(2,1fr);
+  }
+
+  .number{
+    font-size:21px;
+  }
+
+  .game{
+    padding:16px;
+  }
+
+}
+</style>
+</head>
+
+<body>
+
+<div class="game">
+
+<div id="gameScreen">
+
+  <div class="topbar">
+
+    <div class="brand">
+      Clic <span>et Étudie</span>
+    </div>
+
+    <div class="stats">
+      <div class="stat">⭐ <span id="score">0</span></div>
+      <div class="stat">🔥 <span id="streak">0</span></div>
+      <div class="stat">❤️ <span id="lives">3</span></div>
+    </div>
+
+  </div>
+
+  <div class="progress-wrap">
+    <div class="progress" id="progress"></div>
+  </div>
+
+  <div class="round-title" id="roundTitle"></div>
+
+  <h1>🏁 La Course des Décimaux</h1>
+
+  <div class="subtitle">
+    Compare, classe et range les nombres pour faire gagner tes coureurs !
+  </div>
+
+  <div class="instruction" id="instruction"></div>
+
+  <div id="content"></div>
+
+  <div class="actions">
+
+    <button class="ghost" id="hintBtn" onclick="showHint()">
+      💡 Indice − 50 ⭐
+    </button>
+
+    <button class="primary" id="checkBtn" onclick="checkRound()" style="display:none">
+      Valider
+    </button>
+
+    <button class="secondary" id="nextBtn" onclick="nextRound()" style="display:none">
+      Course suivante ➜
+    </button>
+
+  </div>
+
+  <div class="hint-box" id="hintBox"></div>
+
+  <div class="feedback" id="feedback">
+    <strong id="feedbackTitle"></strong><br>
+    <span id="feedbackText"></span>
+  </div>
+
+</div>
+
+
+<div class="end" id="endScreen">
+
+  <div class="end-icon">🏆</div>
+
+  <h1>Course terminée !</h1>
+
+  <div class="big-score">
+    ⭐ <span id="finalScore">0</span>
+  </div>
+
+  <p id="finalMessage"></p>
+
+  <button class="secondary" onclick="restartGame()">
+    🔄 Rejouer
+  </button>
+
+</div>
+
+</div>
+
+
+<script>
+
+/* =============================================
+   MANCHES
+============================================= */
+
+const rounds = [
+
+{
+  type:"compare",
+  title:"Manche 1 — Qui est devant ?",
+  instruction:"Compare les deux nombres et choisis le bon symbole.",
+  left:"4,7",
+  right:"4,07",
+  answer:">",
+  hint:"Écris 4,7 sous la forme 4,70.",
+  explanation:"4,70 est supérieur à 4,07. Donc 4,7 > 4,07."
+},
+
+{
+  type:"order",
+  title:"Manche 2 — Place les coureurs",
+  instruction:"Range les nombres du plus grand au plus petit.",
+  values:["3,6","3,06","3,16","3,61"],
+  direction:"desc",
+  hint:"Tu peux écrire 3,6 = 3,60.",
+  explanation:"3,61 > 3,6 > 3,16 > 3,06."
+},
+
+{
+  type:"order",
+  title:"Manche 3 — Les faux jumeaux",
+  instruction:"Range les nombres du plus petit au plus grand.",
+  values:["5,4","5,40","5,04","5,004"],
+  direction:"asc",
+  hint:"5,4 et 5,40 ont exactement la même valeur.",
+  explanation:"5,004 < 5,04 < 5,4 = 5,40."
+},
+
+{
+  type:"intruder",
+  title:"Manche 4 — Trouve l'intrus",
+  instruction:"Trois nombres sont égaux. Clique sur celui qui est différent.",
+  values:["7,2","7,20","7,200","7,02"],
+  answer:"7,02",
+  hint:"Ajouter des zéros à droite de la partie décimale ne change pas la valeur.",
+  explanation:"7,2 = 7,20 = 7,200. L'intrus est donc 7,02."
+},
+
+{
+  type:"order",
+  title:"Défi final — La grande course",
+  instruction:"Range tous les nombres du plus petit au plus grand.",
+  values:["0,9","0,09","0,909","0,99","1,01","1,001","1,1"],
+  direction:"asc",
+  hint:"Compare d'abord les parties entières, puis les dixièmes, centièmes et millièmes.",
+  explanation:"0,09 < 0,9 < 0,909 < 0,99 < 1,001 < 1,01 < 1,1."
+}
+
+];
+
+
+/* =============================================
+   VARIABLES
+============================================= */
+
+let current = 0;
+let score = 0;
+let streak = 0;
+let lives = 3;
+let answered = false;
+let selected = null;
+let chosenSymbol = null;
+
+
+/* =============================================
+   OUTILS
+============================================= */
+
+function num(v){
+  return Number(v.replace(",","."));
+}
+
+function shuffle(array){
+
+  const a=[...array];
+
+  for(let i=a.length-1;i>0;i--){
+
+    const j=Math.floor(Math.random()*(i+1));
+
+    [a[i],a[j]]=[a[j],a[i]];
+
+  }
+
+  return a;
+}
+
+
+/* =============================================
+   AFFICHAGE
+============================================= */
+
+function loadRound(){
+
+  answered=false;
+  selected=null;
+  chosenSymbol=null;
+
+  const r=rounds[current];
+
+  document.getElementById("roundTitle").textContent=r.title;
+
+  document.getElementById("instruction").textContent=r.instruction;
+
+  document.getElementById("feedback").style.display="none";
+
+  document.getElementById("hintBox").style.display="none";
+
+  document.getElementById("hintBtn").disabled=false;
+
+  document.getElementById("nextBtn").style.display="none";
+
+  document.getElementById("checkBtn").style.display="none";
+
+  document.getElementById("progress").style.width=
+    (current/rounds.length*100)+"%";
+
+  const content=document.getElementById("content");
+
+  content.innerHTML="";
+
+  if(r.type==="compare"){
+    renderCompare(r);
+  }
+
+  if(r.type==="order"){
+    renderOrder(r);
+  }
+
+  if(r.type==="intruder"){
+    renderIntruder(r);
+  }
+
+  updateStats();
+
+}
+
+
+/* =============================================
+   COMPARAISON
+============================================= */
+
+function renderCompare(r){
+
+  const content=document.getElementById("content");
+
+  content.innerHTML=`
+
+    <div class="compare-box">
+
+      <div class="compare-card">
+        🏃 ${r.left}
+      </div>
+
+      <div class="vs">
+        ?
+      </div>
+
+      <div class="compare-card">
+        🏃 ${r.right}
+      </div>
+
+    </div>
+
+    <div class="symbol-buttons">
+
+      <button class="symbol-btn" onclick="chooseSymbol('<')">
+        &lt;
+      </button>
+
+      <button class="symbol-btn" onclick="chooseSymbol('=')">
+        =
+      </button>
+
+      <button class="symbol-btn" onclick="chooseSymbol('>')">
+        &gt;
+      </button>
+
+    </div>
+
+  `;
+
+}
+
+
+function chooseSymbol(symbol){
+
+  if(answered) return;
+
+  chosenSymbol=symbol;
+
+  checkRound();
+
+}
+
+
+/* =============================================
+   RANGEMENT
+============================================= */
+
+function renderOrder(r){
+
+  const content=document.getElementById("content");
+
+  const track=document.createElement("div");
+
+  track.className="track";
+
+  shuffle(r.values).forEach((value,index)=>{
+
+    const racer=document.createElement("div");
+
+    racer.className="racer";
+
+    racer.dataset.value=value;
+
+    racer.innerHTML=`
+
+      <div class="runner">🏃</div>
+
+      <div class="number">${value}</div>
+
+      <div class="position">
+        Position ${index+1}
+      </div>
+
+    `;
+
+    racer.onclick=()=>selectRacer(racer);
+
+    track.appendChild(racer);
+
+  });
+
+  content.appendChild(track);
+
+  document.getElementById("checkBtn").style.display="inline-block";
+
+}
+
+
+function selectRacer(racer){
+
+  if(answered) return;
+
+  if(!selected){
+
+    selected=racer;
+
+    racer.classList.add("selected");
+
+    return;
+
+  }
+
+  if(selected===racer){
+
+    selected.classList.remove("selected");
+
+    selected=null;
+
+    return;
+
+  }
+
+  const parent=racer.parentNode;
+
+  const children=[...parent.children];
+
+  const indexA=children.indexOf(selected);
+
+  const indexB=children.indexOf(racer);
+
+  if(indexA<indexB){
+
+    parent.insertBefore(racer,selected);
+
+  }else{
+
+    parent.insertBefore(selected,racer);
+
+  }
+
+  selected.classList.remove("selected");
+
+  selected=null;
+
+  updatePositions();
+
+}
+
+
+function updatePositions(){
+
+  document.querySelectorAll(".racer").forEach((racer,index)=>{
+
+    racer.querySelector(".position").textContent=
+      "Position "+(index+1);
+
+  });
+
+}
+
+
+/* =============================================
+   INTRUS
+============================================= */
+
+function renderIntruder(r){
+
+  const content=document.getElementById("content");
+
+  const grid=document.createElement("div");
+
+  grid.className="intruder-grid";
+
+  shuffle(r.values).forEach(value=>{
+
+    const btn=document.createElement("button");
+
+    btn.className="intruder";
+
+    btn.textContent=value;
+
+    btn.onclick=()=>{
+
+      if(answered) return;
+
+      selected=value;
+
+      checkRound();
+
+    };
+
+    grid.appendChild(btn);
+
+  });
+
+  content.appendChild(grid);
+
+}
+
+
+/* =============================================
+   VALIDATION
+============================================= */
+
+function checkRound(){
+
+  if(answered) return;
+
+  const r=rounds[current];
+
+  let correct=false;
+
+  if(r.type==="compare"){
+
+    correct=
+      chosenSymbol===r.answer;
+
+  }
+
+
+  if(r.type==="intruder"){
+
+    correct=
+      selected===r.answer;
+
+  }
+
+
+  if(r.type==="order"){
+
+    const racers=[
+      ...document.querySelectorAll(".racer")
+    ];
+
+    const values=
+      racers.map(r=>num(r.dataset.value));
+
+    const expected=[
+      ...values
+    ].sort(
+      (a,b)=>
+        r.direction==="asc"
+        ? a-b
+        : b-a
+    );
+
+    correct=
+      values.every(
+        (value,index)=>
+          Math.abs(value-expected[index])<1e-9
+      );
+
+    racers.forEach((racer,index)=>{
+
+      if(
+        Math.abs(
+          values[index]-expected[index]
+        )<1e-9
+      ){
+
+        racer.classList.add("correct");
+
+      }else{
+
+        racer.classList.add("wrong");
+
+      }
+
+    });
+
+  }
+
+
+  answered=true;
+
+
+  if(correct){
+
+    streak++;
+
+    let points=200;
+
+    if(streak>=3){
+      points+=50;
+    }
+
+    score+=points;
+
+    showFeedback(
+      true,
+      "🏁 Bien joué ! Ton coureur prend la tête !",
+      r.explanation+" ⭐ +"+points
+    );
+
+  }
+
+  else{
+
+    lives--;
+
+    streak=0;
+
+    showFeedback(
+      false,
+      "⚠️ Attention au piège !",
+      r.explanation
+    );
+
+  }
+
+
+  document.getElementById("hintBtn").disabled=true;
+
+  document.getElementById("checkBtn").style.display="none";
+
+  document.getElementById("nextBtn").style.display="inline-block";
+
+  updateStats();
+
+}
+
+
+/* =============================================
+   FEEDBACK
+============================================= */
+
+function showFeedback(good,title,text){
+
+  const feedback=
+    document.getElementById("feedback");
+
+  feedback.className=
+    "feedback "+(good?"good":"bad");
+
+  document.getElementById("feedbackTitle").textContent=
+    title;
+
+  document.getElementById("feedbackText").textContent=
+    text;
+
+  feedback.style.display="block";
+
+}
+
+
+/* =============================================
+   INDICE
+============================================= */
+
+function showHint(){
+
+  const hint=
+    document.getElementById("hintBox");
+
+  hint.textContent=
+    "💡 "+rounds[current].hint;
+
+  hint.style.display="block";
+
+  if(score>=50){
+    score-=50;
+  }
+
+  document.getElementById("hintBtn").disabled=true;
+
+  updateStats();
+
+}
+
+
+/* =============================================
+   SUIVANT
+============================================= */
+
+function nextRound(){
+
+  if(lives<=0){
+
+    finishGame();
+
+    return;
+
+  }
+
+  current++;
+
+  if(current>=rounds.length){
+
+    finishGame();
+
+    return;
+
+  }
+
+  loadRound();
+
+}
+
+
+/* =============================================
+   STATS
+============================================= */
+
+function updateStats(){
+
+  document.getElementById("score").textContent=
+    score;
+
+  document.getElementById("streak").textContent=
+    streak;
+
+  document.getElementById("lives").textContent=
+    lives;
+
+}
+
+
+/* =============================================
+   FIN
+============================================= */
+
+function finishGame(){
+
+  document.getElementById("gameScreen").style.display=
+    "none";
+
+  document.getElementById("endScreen").style.display=
+    "block";
+
+  document.getElementById("finalScore").textContent=
+    score;
+
+  let message;
+
+  if(lives<=0){
+
+    message=
+      "Tu as utilisé tes trois vies. Rejoue la course pour prendre ta revanche !";
+
+  }
+
+  else if(score>=900){
+
+    message=
+      "🏆 Incroyable ! Tu maîtrises très bien la comparaison et le rangement des nombres décimaux.";
+
+  }
+
+  else if(score>=600){
+
+    message=
+      "⭐ Très belle course ! Attention encore aux zéros pièges.";
+
+  }
+
+  else{
+
+    message=
+      "💪 Bonne progression ! Rejoue pour améliorer ton score et devenir champion des décimaux.";
+
+  }
+
+  document.getElementById("finalMessage").textContent=
+    message;
+
+}
+
+
+/* =============================================
+   REJOUER
+============================================= */
+
+function restartGame(){
+
+  current=0;
+  score=0;
+  streak=0;
+  lives=3;
+  answered=false;
+  selected=null;
+  chosenSymbol=null;
+
+  document.getElementById("endScreen").style.display=
+    "none";
+
+  document.getElementById("gameScreen").style.display=
+    "block";
+
+  loadRound();
+
+}
+
+
+/* =============================================
+   DÉMARRAGE
+============================================= */
+
+loadRound();
+
+</script>
+
+</body>
+</html>
