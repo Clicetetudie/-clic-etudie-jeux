@@ -1,0 +1,1898 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Le Marché des Décimaux</title>
+
+  <style>
+    :root {
+      --primary: #6c4df6;
+      --primary-dark: #4b32c7;
+      --secondary: #ffd166;
+      --success: #2bb673;
+      --danger: #ef476f;
+      --ink: #24324a;
+      --paper: #fffdf7;
+      --soft: #f4f0ff;
+      --border: #ded7ff;
+      --shadow: 0 12px 30px rgba(63, 43, 150, 0.16);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: Arial, Helvetica, sans-serif;
+      color: var(--ink);
+      background:
+        radial-gradient(circle at top left, #fff4c9, transparent 35%),
+        linear-gradient(135deg, #f9f7ff, #eef9ff);
+    }
+
+    button,
+    input {
+      font: inherit;
+    }
+
+    button {
+      cursor: pointer;
+    }
+
+    .game-shell {
+      width: min(1100px, 94%);
+      margin: 28px auto;
+    }
+
+    .hero {
+      background: linear-gradient(135deg, var(--primary), #8c6fff);
+      color: white;
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+      text-align: center;
+    }
+
+    .hero h1 {
+      margin: 0 0 8px;
+      font-size: clamp(2rem, 5vw, 3.4rem);
+    }
+
+    .hero p {
+      margin: 0;
+      font-size: 1.08rem;
+      opacity: 0.95;
+    }
+
+    .dashboard {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 12px;
+      margin: 18px 0;
+    }
+
+    .dashboard-card {
+      background: white;
+      border-radius: 16px;
+      padding: 14px;
+      text-align: center;
+      box-shadow: var(--shadow);
+      border: 2px solid var(--border);
+    }
+
+    .dashboard-card strong {
+      display: block;
+      margin-top: 4px;
+      font-size: 1.25rem;
+    }
+
+    .panel {
+      background: rgba(255, 255, 255, 0.97);
+      border: 2px solid var(--border);
+      border-radius: 24px;
+      padding: 24px;
+      box-shadow: var(--shadow);
+    }
+
+    .screen {
+      display: none;
+    }
+
+    .screen.active {
+      display: block;
+    }
+
+    .level-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 16px;
+      margin-top: 22px;
+    }
+
+    .level-card {
+      border: 2px solid var(--border);
+      border-radius: 20px;
+      padding: 20px;
+      background: var(--paper);
+      transition: transform 0.18s ease, box-shadow 0.18s ease;
+    }
+
+    .level-card:hover {
+      transform: translateY(-4px);
+      box-shadow: var(--shadow);
+    }
+
+    .level-card h3 {
+      margin-top: 0;
+      color: var(--primary-dark);
+    }
+
+    .level-card p {
+      min-height: 48px;
+    }
+
+    .btn {
+      border: none;
+      border-radius: 14px;
+      padding: 12px 18px;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease;
+    }
+
+    .btn:hover {
+      transform: translateY(-2px);
+    }
+
+    .btn:disabled {
+      cursor: not-allowed;
+      opacity: 0.55;
+      transform: none;
+    }
+
+    .btn-primary {
+      background: var(--primary);
+      color: white;
+    }
+
+    .btn-success {
+      background: var(--success);
+      color: white;
+    }
+
+    .btn-danger {
+      background: var(--danger);
+      color: white;
+    }
+
+    .btn-light {
+      background: white;
+      color: var(--primary-dark);
+      border: 2px solid var(--border);
+    }
+
+    .game-topline,
+    .action-row {
+      display: flex;
+      gap: 12px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .instruction {
+      margin: 18px 0;
+      padding: 16px;
+      border-left: 6px solid var(--secondary);
+      border-radius: 12px;
+      background: #fff8dc;
+      font-size: 1.08rem;
+    }
+
+    .target-box {
+      text-align: center;
+      background: var(--soft);
+      border: 2px dashed var(--primary);
+      border-radius: 18px;
+      padding: 18px;
+      margin: 16px 0;
+    }
+
+    .target-box .amount {
+      font-size: clamp(2rem, 6vw, 3.2rem);
+      font-weight: 800;
+      color: var(--primary-dark);
+    }
+
+    .products-grid {
+      display: grid;
+      grid-template-columns: repeat(4, minmax(0, 1fr));
+      gap: 14px;
+      margin: 20px 0;
+    }
+
+    .product-card {
+      border: 3px solid transparent;
+      border-radius: 18px;
+      padding: 16px 10px;
+      text-align: center;
+      background: white;
+      box-shadow: 0 7px 18px rgba(50, 48, 90, 0.11);
+      user-select: none;
+      transition: transform 0.16s ease, border-color 0.16s ease;
+    }
+
+    .product-card:hover {
+      transform: scale(1.03);
+    }
+
+    .product-card.selected {
+      border-color: var(--success);
+      background: #edfff6;
+    }
+
+    .emoji {
+      display: block;
+      font-size: 2.6rem;
+      margin-bottom: 8px;
+    }
+
+    .product-name {
+      font-weight: 700;
+      margin-bottom: 6px;
+    }
+
+    .product-price {
+      color: var(--primary-dark);
+      font-weight: 800;
+      font-size: 1.12rem;
+    }
+
+    .basket {
+      padding: 14px;
+      border-radius: 16px;
+      background: #f4fbff;
+      border: 2px solid #c9ebff;
+      margin: 16px 0;
+    }
+
+    .basket-total {
+      font-size: 1.45rem;
+      font-weight: 800;
+      text-align: center;
+    }
+
+    .answer-zone {
+      max-width: 460px;
+      margin: 20px auto;
+      text-align: center;
+    }
+
+    .answer-zone input {
+      width: 100%;
+      padding: 15px;
+      border-radius: 14px;
+      border: 2px solid var(--border);
+      font-size: 1.4rem;
+      text-align: center;
+      outline: none;
+    }
+
+    .answer-zone input:focus {
+      border-color: var(--primary);
+    }
+
+    .pirate-box {
+      max-width: 700px;
+      margin: 20px auto;
+      padding: 24px;
+      text-align: center;
+      border-radius: 22px;
+      color: white;
+      background:
+        linear-gradient(rgba(34, 25, 14, 0.8), rgba(34, 25, 14, 0.8)),
+        repeating-linear-gradient(
+          90deg,
+          #6e4b27 0,
+          #6e4b27 32px,
+          #7f5830 32px,
+          #7f5830 64px
+        );
+      box-shadow: var(--shadow);
+    }
+
+    .pirate-box .equation {
+      font-size: clamp(2rem, 6vw, 3.4rem);
+      font-weight: 800;
+      margin: 18px 0;
+    }
+
+    .locks {
+      display: flex;
+      justify-content: center;
+      gap: 12px;
+      margin-top: 18px;
+      font-size: 2rem;
+    }
+
+    .feedback {
+      min-height: 48px;
+      padding: 12px;
+      margin-top: 16px;
+      border-radius: 14px;
+      font-weight: 700;
+      text-align: center;
+    }
+
+    .feedback.success {
+      background: #e9fff3;
+      color: #137a49;
+      border: 2px solid #98e8be;
+    }
+
+    .feedback.error {
+      background: #fff0f4;
+      color: #ad2145;
+      border: 2px solid #ffb1c5;
+    }
+
+    .feedback.info {
+      background: #eef4ff;
+      color: #3155a4;
+      border: 2px solid #b7c9ff;
+    }
+
+    .progress-wrap {
+      width: 100%;
+      height: 18px;
+      overflow: hidden;
+      border-radius: 999px;
+      background: #ece9ff;
+      margin: 14px 0;
+    }
+
+    .progress-bar {
+      width: 0;
+      height: 100%;
+      background: linear-gradient(90deg, var(--secondary), var(--success));
+      transition: width 0.3s ease;
+    }
+
+    .final-card {
+      text-align: center;
+      padding: 30px;
+    }
+
+    .final-card .big-emoji {
+      font-size: 4rem;
+    }
+
+    .final-card h2 {
+      color: var(--primary-dark);
+      font-size: 2.2rem;
+    }
+
+    @media (max-width: 800px) {
+      .dashboard {
+        grid-template-columns: repeat(2, 1fr);
+      }
+
+      .products-grid,
+      .level-grid {
+        grid-template-columns: repeat(2, minmax(0, 1fr));
+      }
+    }
+
+    @media (max-width: 520px) {
+      .products-grid,
+      .level-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .panel {
+        padding: 16px;
+      }
+    }
+  </style>
+</head>
+
+<body>
+  <main class="game-shell">
+
+    <header class="hero">
+      <h1>🛒 Le Marché des Décimaux</h1>
+      <p>Additionne, soustrais et ouvre le coffre du marchand !</p>
+    </header>
+
+    <section class="dashboard" aria-label="Tableau de bord">
+
+      <div class="dashboard-card">
+        Niveau
+        <strong id="levelDisplay">Accueil</strong>
+      </div>
+
+      <div class="dashboard-card">
+        Score
+        <strong id="scoreDisplay">0</strong>
+      </div>
+
+      <div class="dashboard-card">
+        Vies
+        <strong id="livesDisplay">❤️❤️❤️</strong>
+      </div>
+
+      <div class="dashboard-card">
+        Question
+        <strong id="questionDisplay">0 / 5</strong>
+      </div>
+
+    </section>
+
+    <section class="panel">
+
+      <div id="homeScreen" class="screen active">
+
+        <h2>Choisis ton niveau</h2>
+
+        <p>
+          Chaque niveau contient 5 défis.
+          Tu gagnes 10 points par bonne réponse.
+        </p>
+
+        <div class="level-grid">
+
+          <article class="level-card">
+
+            <h3>🥕 Niveau 1 — Le panier exact</h3>
+
+            <p>
+              Sélectionne des produits pour obtenir exactement le montant demandé.
+            </p>
+
+            <button
+              class="btn btn-primary"
+              onclick="startLevel(1)">
+              Jouer au niveau 1
+            </button>
+
+          </article>
+
+
+          <article class="level-card">
+
+            <h3>💶 Niveau 2 — Rendre la monnaie</h3>
+
+            <p>
+              Calcule la monnaie à rendre après un achat au marché.
+            </p>
+
+            <button
+              class="btn btn-primary"
+              onclick="startLevel(2)">
+              Jouer au niveau 2
+            </button>
+
+          </article>
+
+
+          <article class="level-card">
+
+            <h3>📦 Niveau 3 — Le stock du marchand</h3>
+
+            <p>
+              Calcule une quantité après un ajout ou un retrait de marchandises.
+            </p>
+
+            <button
+              class="btn btn-primary"
+              onclick="startLevel(3)">
+              Jouer au niveau 3
+            </button>
+
+          </article>
+
+
+          <article class="level-card">
+
+            <h3>🏴‍☠️ Niveau 4 — Le coffre mystère</h3>
+
+            <p>
+              Trouve le nombre manquant pour ouvrir les cadenas du coffre.
+            </p>
+
+            <button
+              class="btn btn-primary"
+              onclick="startLevel(4)">
+              Jouer au niveau 4
+            </button>
+
+          </article>
+
+        </div>
+
+      </div>
+
+
+      <div id="gameScreen" class="screen">
+
+        <div class="game-topline">
+
+          <button
+            class="btn btn-light"
+            onclick="goHome()">
+
+            ← Retour aux niveaux
+
+          </button>
+
+
+          <button
+            class="btn btn-danger"
+            onclick="restartLevel()">
+
+            Recommencer
+
+          </button>
+
+        </div>
+
+
+        <div
+          class="progress-wrap"
+          aria-label="Progression">
+
+          <div
+            id="progressBar"
+            class="progress-bar">
+          </div>
+
+        </div>
+
+
+        <div id="gameContent"></div>
+
+
+        <div
+          id="feedback"
+          class="feedback info">
+
+          Lis bien la consigne avant de répondre.
+
+        </div>
+
+      </div>
+
+
+      <div id="endScreen" class="screen">
+
+        <div class="final-card">
+
+          <div
+            id="finalEmoji"
+            class="big-emoji">
+
+            🎉
+
+          </div>
+
+
+          <h2 id="finalTitle">
+            Niveau terminé !
+          </h2>
+
+
+          <p id="finalMessage"></p>
+
+
+          <div
+            class="action-row"
+            style="justify-content:center;">
+
+            <button
+              class="btn btn-primary"
+              onclick="restartLevel()">
+
+              Rejouer ce niveau
+
+            </button>
+
+
+            <button
+              class="btn btn-success"
+              onclick="goHome()">
+
+              Choisir un autre niveau
+
+            </button>
+
+          </div>
+
+        </div>
+
+      </div>
+
+    </section>
+
+  </main>
+
+
+  <script>
+
+    const productCatalog = [
+
+      { name: "Pommes", emoji: "🍎" },
+      { name: "Pain", emoji: "🥖" },
+      { name: "Lait", emoji: "🥛" },
+      { name: "Fromage", emoji: "🧀" },
+      { name: "Jus", emoji: "🧃" },
+      { name: "Carottes", emoji: "🥕" },
+      { name: "Raisins", emoji: "🍇" },
+      { name: "Chocolat", emoji: "🍫" },
+      { name: "Tomates", emoji: "🍅" },
+      { name: "Poisson", emoji: "🐟" },
+      { name: "Œufs", emoji: "🥚" },
+      { name: "Fraises", emoji: "🍓" }
+
+    ];
+
+
+    const state = {
+
+      level: 1,
+      score: 0,
+      lives: 3,
+      questionIndex: 0,
+      totalQuestions: 5,
+      currentAnswer: 0,
+      selectedProducts: [],
+      products: [],
+      target: 0,
+      locked: false
+
+    };
+
+
+    const homeScreen =
+      document.getElementById("homeScreen");
+
+    const gameScreen =
+      document.getElementById("gameScreen");
+
+    const endScreen =
+      document.getElementById("endScreen");
+
+    const gameContent =
+      document.getElementById("gameContent");
+
+    const feedback =
+      document.getElementById("feedback");
+
+
+    function money(value) {
+
+      return value
+        .toFixed(2)
+        .replace(".", ",")
+        + " €";
+
+    }
+
+
+    function decimal(value) {
+
+      return Number(value.toFixed(2))
+        .toString()
+        .replace(".", ",");
+
+    }
+
+
+    function parseFrenchNumber(value) {
+
+      return Number(
+        String(value)
+          .replace(",", ".")
+          .trim()
+      );
+
+    }
+
+
+    function randomInt(min, max) {
+
+      return Math.floor(
+        Math.random() *
+        (max - min + 1)
+      ) + min;
+
+    }
+
+
+    function randomDecimal(min, max) {
+
+      return randomInt(
+        Math.round(min * 10),
+        Math.round(max * 10)
+      ) / 10;
+
+    }
+
+
+    function round2(value) {
+
+      return Math.round(
+        (value + Number.EPSILON) * 100
+      ) / 100;
+
+    }
+
+
+    function approximatelyEqual(a, b) {
+
+      return Math.abs(a - b) < 0.005;
+
+    }
+
+
+    function updateDashboard() {
+
+      document.getElementById(
+        "levelDisplay"
+      ).textContent =
+        state.level
+          ? "Niveau " + state.level
+          : "Accueil";
+
+
+      document.getElementById(
+        "scoreDisplay"
+      ).textContent =
+        state.score;
+
+
+      document.getElementById(
+        "livesDisplay"
+      ).textContent =
+        "❤️".repeat(state.lives)
+        +
+        "🖤".repeat(3 - state.lives);
+
+
+      document.getElementById(
+        "questionDisplay"
+      ).textContent =
+        `${Math.min(
+          state.questionIndex + 1,
+          state.totalQuestions
+        )} / ${state.totalQuestions}`;
+
+
+      const progress =
+        (
+          state.questionIndex /
+          state.totalQuestions
+        ) * 100;
+
+
+      document.getElementById(
+        "progressBar"
+      ).style.width =
+        progress + "%";
+
+    }
+
+
+    function setScreen(screen) {
+
+      [
+        homeScreen,
+        gameScreen,
+        endScreen
+      ].forEach(
+        el => el.classList.remove("active")
+      );
+
+
+      screen.classList.add("active");
+
+    }
+
+
+    function setFeedback(
+      message,
+      type = "info"
+    ) {
+
+      feedback.textContent =
+        message;
+
+
+      feedback.className =
+        "feedback " + type;
+
+    }
+
+
+    function startLevel(level) {
+
+      state.level =
+        level;
+
+      state.score =
+        0;
+
+      state.lives =
+        3;
+
+      state.questionIndex =
+        0;
+
+      state.locked =
+        false;
+
+
+      setScreen(
+        gameScreen
+      );
+
+
+      updateDashboard();
+
+      loadQuestion();
+
+    }
+
+
+    function restartLevel() {
+
+      startLevel(
+        state.level
+      );
+
+    }
+
+
+    function goHome() {
+
+      state.level =
+        0;
+
+      state.questionIndex =
+        0;
+
+
+      setScreen(
+        homeScreen
+      );
+
+
+      document.getElementById(
+        "levelDisplay"
+      ).textContent =
+        "Accueil";
+
+
+      document.getElementById(
+        "scoreDisplay"
+      ).textContent =
+        state.score;
+
+
+      document.getElementById(
+        "livesDisplay"
+      ).textContent =
+        "❤️❤️❤️";
+
+
+      document.getElementById(
+        "questionDisplay"
+      ).textContent =
+        "0 / 5";
+
+    }
+
+
+    function loadQuestion() {
+
+      state.locked =
+        false;
+
+
+      state.selectedProducts =
+        [];
+
+
+      updateDashboard();
+
+
+      setFeedback(
+        "À toi de jouer !",
+        "info"
+      );
+
+
+      if (state.level === 1)
+        renderLevel1();
+
+
+      if (state.level === 2)
+        renderLevel2();
+
+
+      if (state.level === 3)
+        renderLevel3();
+
+
+      if (state.level === 4)
+        renderLevel4();
+
+    }
+
+
+    function renderLevel1() {
+
+      const shuffled =
+        [...productCatalog]
+          .sort(() => Math.random() - 0.5);
+
+
+      const chosen =
+        shuffled.slice(0, 6);
+
+
+      state.products =
+        chosen.map(
+          (product, index) => ({
+            ...product,
+            price:
+              randomDecimal(1.2, 8.9),
+            id: index
+          })
+        );
+
+
+      const solutionIndexes =
+        [...state.products.keys()]
+          .sort(() => Math.random() - 0.5)
+          .slice(
+            0,
+            randomInt(2, 3)
+          );
+
+
+      state.target =
+        round2(
+
+          solutionIndexes.reduce(
+
+            (sum, index) =>
+              sum +
+              state.products[index].price,
+
+            0
+
+          )
+
+        );
+
+
+      gameContent.innerHTML = `
+
+        <div class="instruction">
+
+          Sélectionne un ou plusieurs produits
+          pour obtenir exactement
+
+          <strong>
+            ${money(state.target)}
+          </strong>.
+
+        </div>
+
+
+        <div class="target-box">
+
+          Montant à atteindre
+
+          <div class="amount">
+            ${money(state.target)}
+          </div>
+
+        </div>
+
+
+        <div class="products-grid">
+
+          ${state.products.map(
+            product => `
+
+            <button
+              class="product-card"
+              id="product-${product.id}"
+              onclick="toggleProduct(${product.id})"
+            >
+
+              <span class="emoji">
+                ${product.emoji}
+              </span>
+
+              <div class="product-name">
+                ${product.name}
+              </div>
+
+              <div class="product-price">
+                ${money(product.price)}
+              </div>
+
+            </button>
+
+          `
+          ).join("")}
+
+        </div>
+
+
+        <div class="basket">
+
+          <div id="basketDetails">
+            Ton panier est vide.
+          </div>
+
+          <div class="basket-total">
+
+            Total :
+            <span id="basketTotal">
+              0,00 €
+            </span>
+
+          </div>
+
+        </div>
+
+
+        <div class="action-row">
+
+          <button
+            class="btn btn-light"
+            onclick="clearBasket()">
+
+            Vider le panier
+
+          </button>
+
+
+          <button
+            class="btn btn-success"
+            onclick="checkLevel1()">
+
+            Valider mon panier
+
+          </button>
+
+        </div>
+
+      `;
+
+    }
+
+
+    function toggleProduct(id) {
+
+      if (state.locked)
+        return;
+
+
+      const position =
+        state.selectedProducts.indexOf(id);
+
+
+      if (position >= 0) {
+
+        state.selectedProducts.splice(
+          position,
+          1
+        );
+
+      }
+
+      else {
+
+        state.selectedProducts.push(id);
+
+      }
+
+
+      document.getElementById(
+        `product-${id}`
+      ).classList.toggle(
+        "selected"
+      );
+
+
+      updateBasket();
+
+    }
+
+
+    function clearBasket() {
+
+      state.selectedProducts =
+        [];
+
+
+      document
+        .querySelectorAll(
+          ".product-card"
+        )
+        .forEach(
+          card =>
+            card.classList.remove(
+              "selected"
+            )
+        );
+
+
+      updateBasket();
+
+    }
+
+
+    function updateBasket() {
+
+      const selected =
+        state.selectedProducts.map(
+          id =>
+            state.products[id]
+        );
+
+
+      const total =
+        round2(
+
+          selected.reduce(
+
+            (sum, product) =>
+              sum + product.price,
+
+            0
+
+          )
+
+        );
+
+
+      document.getElementById(
+        "basketTotal"
+      ).textContent =
+        money(total);
+
+
+      document.getElementById(
+        "basketDetails"
+      ).textContent =
+
+        selected.length
+
+          ? selected.map(
+              product =>
+                `${product.emoji} ${product.name}`
+            ).join(" + ")
+
+          : "Ton panier est vide.";
+
+    }
+
+
+    function checkLevel1() {
+
+      const total =
+        round2(
+
+          state.selectedProducts.reduce(
+
+            (sum, id) =>
+              sum +
+              state.products[id].price,
+
+            0
+
+          )
+
+        );
+
+
+      if (
+        state.selectedProducts.length === 0
+      ) {
+
+        setFeedback(
+          "Choisis au moins un produit.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      submitAnswer(
+        total,
+        state.target,
+        `Le total exact était ${money(state.target)}.`
+      );
+
+    }
+
+
+    function renderLevel2() {
+
+      const purchase =
+        randomDecimal(
+          4.5,
+          35.0
+        );
+
+
+      const possiblePayments =
+        [10, 20, 50];
+
+
+      let payment =
+        possiblePayments.find(
+          value =>
+            value > purchase + 1
+        );
+
+
+      if (!payment)
+        payment = 50;
+
+
+      state.currentAnswer =
+        round2(
+          payment - purchase
+        );
+
+
+      gameContent.innerHTML = `
+
+        <div class="instruction">
+
+          Un client achète des produits
+          pour
+
+          <strong>
+            ${money(purchase)}
+          </strong>
+
+          et paie avec un billet de
+
+          <strong>
+            ${money(payment)}
+          </strong>.
+
+        </div>
+
+
+        <div class="target-box">
+
+          Quelle monnaie faut-il rendre ?
+
+          <div class="amount">
+            ${money(payment)}
+            −
+            ${money(purchase)}
+          </div>
+
+        </div>
+
+
+        <div class="answer-zone">
+
+          <input
+            id="answerInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="Exemple : 7,40"
+            onkeydown="
+              if(event.key === 'Enter')
+                checkInputAnswer()
+            "
+          />
+
+
+          <button
+            class="btn btn-success"
+            style="margin-top:12px;"
+            onclick="checkInputAnswer()">
+
+            Valider
+
+          </button>
+
+        </div>
+
+      `;
+
+
+      focusAnswer();
+
+    }
+
+
+    function renderLevel3() {
+
+      const isAddition =
+        Math.random() > 0.5;
+
+
+      let start;
+
+      let change;
+
+
+      if (isAddition) {
+
+        start =
+          randomDecimal(5, 35);
+
+        change =
+          randomDecimal(1, 15);
+
+        state.currentAnswer =
+          round2(
+            start + change
+          );
+
+      }
+
+      else {
+
+        start =
+          randomDecimal(15, 45);
+
+        change =
+          randomDecimal(
+            1,
+            Math.max(
+              2,
+              start - 2
+            )
+          );
+
+        state.currentAnswer =
+          round2(
+            start - change
+          );
+
+      }
+
+
+      const verb =
+        isAddition
+          ? "reçoit"
+          : "vend";
+
+
+      const unit =
+        Math.random() > 0.5
+          ? "kg de fruits"
+          : "litres de jus";
+
+
+      const symbol =
+        isAddition
+          ? "+"
+          : "−";
+
+
+      gameContent.innerHTML = `
+
+        <div class="instruction">
+
+          Le marchand possède
+
+          <strong>
+            ${decimal(start)} ${unit}
+          </strong>.
+
+          Il ${verb} ensuite
+
+          <strong>
+            ${decimal(change)} ${unit}
+          </strong>.
+
+        </div>
+
+
+        <div class="target-box">
+
+          Combien lui en reste-t-il maintenant ?
+
+          <div class="amount">
+            ${decimal(start)}
+            ${symbol}
+            ${decimal(change)}
+          </div>
+
+        </div>
+
+
+        <div class="answer-zone">
+
+          <input
+            id="answerInput"
+            type="text"
+            inputmode="decimal"
+            placeholder="Écris ta réponse"
+            onkeydown="
+              if(event.key === 'Enter')
+                checkInputAnswer()
+            "
+          />
+
+
+          <button
+            class="btn btn-success"
+            style="margin-top:12px;"
+            onclick="checkInputAnswer()">
+
+            Valider
+
+          </button>
+
+        </div>
+
+      `;
+
+
+      focusAnswer();
+
+    }
+
+
+    function renderLevel4() {
+
+      const pattern =
+        randomInt(1, 4);
+
+
+      let a =
+        randomDecimal(3, 25);
+
+
+      let b =
+        randomDecimal(1, 15);
+
+
+      let result;
+
+      let equation;
+
+
+      if (pattern === 1) {
+
+        result =
+          round2(
+            a + b
+          );
+
+
+        state.currentAnswer =
+          b;
+
+
+        equation =
+          `${decimal(a)} + ? = ${decimal(result)}`;
+
+      }
+
+
+      if (pattern === 2) {
+
+        result =
+          round2(
+            a + b
+          );
+
+
+        state.currentAnswer =
+          a;
+
+
+        equation =
+          `? + ${decimal(b)} = ${decimal(result)}`;
+
+      }
+
+
+      if (pattern === 3) {
+
+        a =
+          randomDecimal(15, 40);
+
+
+        b =
+          randomDecimal(
+            1,
+            a - 2
+          );
+
+
+        result =
+          round2(
+            a - b
+          );
+
+
+        state.currentAnswer =
+          b;
+
+
+        equation =
+          `${decimal(a)} − ? = ${decimal(result)}`;
+
+      }
+
+
+      if (pattern === 4) {
+
+        a =
+          randomDecimal(15, 40);
+
+
+        b =
+          randomDecimal(
+            1,
+            a - 2
+          );
+
+
+        result =
+          round2(
+            a - b
+          );
+
+
+        state.currentAnswer =
+          a;
+
+
+        equation =
+          `? − ${decimal(b)} = ${decimal(result)}`;
+
+      }
+
+
+      const openedLocks =
+        state.questionIndex;
+
+
+      gameContent.innerHTML = `
+
+        <div class="pirate-box">
+
+          <div style="font-size:3.5rem;">
+            🏴‍☠️🧰
+          </div>
+
+
+          <h2>
+            Le coffre mystère
+          </h2>
+
+
+          <p>
+            Trouve le nombre caché
+            pour ouvrir un cadenas.
+          </p>
+
+
+          <div class="equation">
+            ${equation}
+          </div>
+
+
+          <div class="answer-zone">
+
+            <input
+              id="answerInput"
+              type="text"
+              inputmode="decimal"
+              placeholder="Nombre manquant"
+              onkeydown="
+                if(event.key === 'Enter')
+                  checkInputAnswer()
+              "
+            />
+
+
+            <button
+              class="btn btn-success"
+              style="margin-top:12px;"
+              onclick="checkInputAnswer()">
+
+              Ouvrir le cadenas
+
+            </button>
+
+          </div>
+
+
+          <div class="locks">
+
+            ${
+              Array.from(
+                { length: 5 },
+                (_, index) =>
+                  index < openedLocks
+                    ? "🔓"
+                    : "🔒"
+              ).join("")
+            }
+
+          </div>
+
+        </div>
+
+      `;
+
+
+      focusAnswer();
+
+    }
+
+
+    function focusAnswer() {
+
+      setTimeout(
+        () => {
+
+          const input =
+            document.getElementById(
+              "answerInput"
+            );
+
+
+          if (input)
+            input.focus();
+
+        },
+        100
+      );
+
+    }
+
+
+    function checkInputAnswer() {
+
+      if (state.locked)
+        return;
+
+
+      const input =
+        document.getElementById(
+          "answerInput"
+        );
+
+
+      const value =
+        parseFrenchNumber(
+          input.value
+        );
+
+
+      if (!Number.isFinite(value)) {
+
+        setFeedback(
+          "Écris un nombre valide. Tu peux utiliser une virgule.",
+          "error"
+        );
+
+        return;
+
+      }
+
+
+      submitAnswer(
+
+        value,
+
+        state.currentAnswer,
+
+        `La bonne réponse était ${decimal(state.currentAnswer)}.`
+
+      );
+
+    }
+
+
+    function submitAnswer(
+      givenAnswer,
+      correctAnswer,
+      correctionMessage
+    ) {
+
+      if (state.locked)
+        return;
+
+
+      if (
+        approximatelyEqual(
+          givenAnswer,
+          correctAnswer
+        )
+      ) {
+
+        state.locked =
+          true;
+
+
+        state.score +=
+          10;
+
+
+        setFeedback(
+          "Bravo ! Bonne réponse. +10 points ⭐",
+          "success"
+        );
+
+
+        updateDashboard();
+
+
+        setTimeout(
+          () => {
+
+            state.questionIndex +=
+              1;
+
+
+            if (
+              state.questionIndex
+              >=
+              state.totalQuestions
+            ) {
+
+              finishLevel(true);
+
+            }
+
+            else {
+
+              loadQuestion();
+
+            }
+
+          },
+          900
+        );
+
+      }
+
+      else {
+
+        state.lives -=
+          1;
+
+
+        updateDashboard();
+
+
+        if (state.lives <= 0) {
+
+          state.locked =
+            true;
+
+
+          setFeedback(
+            `Tu n'as plus de vies. ${correctionMessage}`,
+            "error"
+          );
+
+
+          setTimeout(
+            () =>
+              finishLevel(false),
+            1300
+          );
+
+        }
+
+        else {
+
+          setFeedback(
+            `Ce n'est pas encore ça. ${correctionMessage} Il te reste ${state.lives} vie(s).`,
+            "error"
+          );
+
+        }
+
+      }
+
+    }
+
+
+    function finishLevel(success) {
+
+      setScreen(
+        endScreen
+      );
+
+
+      document.getElementById(
+        "progressBar"
+      ).style.width =
+
+        success
+
+          ? "100%"
+
+          : `${
+              (
+                state.questionIndex /
+                state.totalQuestions
+              ) * 100
+            }%`;
+
+
+      const finalEmoji =
+        document.getElementById(
+          "finalEmoji"
+        );
+
+
+      const finalTitle =
+        document.getElementById(
+          "finalTitle"
+        );
+
+
+      const finalMessage =
+        document.getElementById(
+          "finalMessage"
+        );
+
+
+      if (success) {
+
+        finalEmoji.textContent =
+          state.level === 4
+            ? "🏴‍☠️💎"
+            : "🎉";
+
+
+        finalTitle.textContent =
+          state.level === 4
+            ? "Le coffre est ouvert !"
+            : "Niveau réussi !";
+
+
+        finalMessage.textContent =
+          `Tu as terminé le niveau ${state.level} avec ${state.score} points.`;
+
+      }
+
+      else {
+
+        finalEmoji.textContent =
+          "💪";
+
+
+        finalTitle.textContent =
+          "Continue à t'entraîner !";
+
+
+        finalMessage.textContent =
+          `Tu as obtenu ${state.score} points. Rejoue le niveau pour progresser.`;
+
+      }
+
+    }
+
+  </script>
+
+</body>
+</html>
